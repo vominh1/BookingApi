@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tạo Booking Mới</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #fafafa;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+            button:hover {
+                background: #0056b3;
+            }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e7f3ff;
+            border: 1px solid #b3d8ff;
+            border-radius: 6px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>➕ Tạo Booking Mới</h1>
+
+    <form id="createForm">
+        <label>ID Khách hàng:</label>
+        <input type="number" id="customerId" placeholder="VD: 1">
+
+        <label>ID Nhân viên (User):</label>
+        <input type="number" id="userId" placeholder="VD: 2">
+
+        <label>Ghi chú:</label>
+        <textarea id="note" placeholder="Ghi chú thêm..."></textarea>
+
+        <button type="button" onclick="createBooking()">Tạo Booking</button>
+    </form>
+
+
+    <div id="result"></div>
+
+    <script>
+        const API_URL = "https://localhost:44336/api/booking/byform";
+
+
+        async function createBooking() {
+            const customerId = document.getElementById("customerId").value;
+            const userId = document.getElementById("userId").value;
+            const note = document.getElementById("note").value;
+
+            const booking = {
+                customerId: customerId ? parseInt(customerId) : null,
+                userId: userId ? parseInt(userId) : null,
+                note: note || ""
+            };
+
+            try {
+                const response = await fetch("https://localhost:44336/api/booking/byform", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(booking)
+                });
+
+                const resultDiv = document.getElementById("result");
+                resultDiv.style.display = "block";
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                <strong>✅ ${data.message}</strong><br>
+                Mã Booking: ${data.bookingCode}<br>
+                Booking ID: ${data.bookingId}<br>
+                Ghi chú: ${data.note || '(Không có)'}
+            `;
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<strong style="color:red;">❌ Lỗi:</strong> ${error}`;
+                }
+            } catch (err) {
+                alert("Lỗi kết nối tới API: " + err.message);
+            }
+        }
+
+
+    </script>
+</body>
+</html>

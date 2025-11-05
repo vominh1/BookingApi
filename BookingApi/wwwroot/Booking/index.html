@@ -1,0 +1,525 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+            .header h1 {
+                font-size: 24px;
+                color: #333;
+                margin-bottom: 15px;
+            }
+
+        .create-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+            .create-btn:hover {
+                background: #45a049;
+            }
+
+        .booking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .booking-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: box-shadow 0.2s;
+        }
+
+            .booking-card:hover {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            }
+
+        .booking-code {
+            background: #3B82F6 ;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .booking-info {
+            flex: 1;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            justify-content:center;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 15px;
+            color: #666;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .booking-total {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            min-width: 150px;
+        }
+
+        .total-label {
+            font-size: 15px;
+            color: #666;
+        }
+
+        .total-value {
+            font-size: 18px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .booking-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 2px solid #2196F3;
+            color: #2196F3;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            min-width: 120px;
+        }
+
+            .action-btn:hover {
+                background: #2196F3;
+                color: white;
+            }
+
+        .detail-link {
+            color: #2196F3;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .detail-link:hover {
+                text-decoration: underline;
+            }
+
+        
+
+           
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 600px;
+            width: 90%;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -45%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+            .modal-header h2 {
+                font-size: 20px;
+                color: #333;
+            }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            line-height: 1;
+        }
+
+            .close-btn:hover {
+                color: #333;
+            }
+
+        .modal-content {
+            margin-bottom: 20px;
+        }
+
+        .modal-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+            .modal-row:last-child {
+                border-bottom: none;
+            }
+
+        .modal-label {
+            font-weight: 600;
+            color: #666;
+            min-width: 150px;
+        }
+
+        .modal-value {
+            color: #333;
+            flex: 1;
+        }
+
+        .modal-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+            .modal-section h3 {
+                font-size: 16px;
+                color: #333;
+                margin-bottom: 12px;
+            }
+
+        .modal-footer {
+            text-align: right;
+        }
+
+            .modal-footer button {
+                background: #2196F3;
+                color: white;
+                border: none;
+                padding: 10px 24px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+                .modal-footer button:hover {
+                    background: #1976D2;
+                }
+
+        @media (max-width: 768px) {
+            .booking-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .booking-info {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .booking-total,
+            .booking-actions {
+                align-items: flex-start;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Danh sách Booking</h1>
+            <button class="create-btn" onclick="createBooking()">
+                ➕ Tạo Booking Mới
+            </button>
+        </div>
+
+        <div class="booking-list" id="bookingList">
+            <!-- Bookings will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+    <div class="modal" id="detailModal">
+        <div class="modal-header">
+            <h2>Chi tiết Booking</h2>
+            <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-content" id="modalContent">
+            <p>Đang tải...</p>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeModal()">Đóng</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "https://localhost:44336/api/booking";
+
+        document.addEventListener('DOMContentLoaded', loadBookings);
+
+        function createBooking() {
+            window.location.href = 'createBooking.html';
+        }
+
+        async function loadBookings() {
+            try {
+                const response = await fetch(API_BASE);
+                if (!response.ok) throw new Error("Không thể tải dữ liệu: " + response.status);
+                const data = await response.json();
+
+                const list = Array.isArray(data) ? data : (data.items || [data]);
+                renderBookings(list);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('bookingList').innerHTML =
+                    '<p style="text-align: center; color: #999; padding: 40px;">Lỗi tải danh sách: ' + err.message + '</p>';
+            }
+        }
+
+        function renderBookings(bookings) {
+            const container = document.getElementById('bookingList');
+            container.innerHTML = '';
+
+            bookings.forEach(b => {
+                const bookingCode = b.bookingCode || b.booking_code || b.BookingCode || '';
+                const created = b.createdAt || b.CreatedAt || b.created_at || b.createdOn;
+                const date = created ? new Date(created).toLocaleDateString('vi-VN') : '';
+                const quantity = b.quantity || b.Quantity || 1;
+                const total = b.totalAmount || b.TotalAmount || b.total || 0;
+                const statusName = b.statusName || b.StatusName || 'Chờ xác nhận';
+
+                const card = document.createElement('div');
+                card.className = 'booking-card';
+                card.innerHTML = `
+                            <div class="booking-code">${escapeHtml(bookingCode)}</div>
+                            <div class="booking-info">
+                                <div class="info-item">
+                                    <span class="info-label">Ngày đặt:</span>
+                                    <span class="info-value">${escapeHtml(date)}</span>
+                                </div>
+                               
+                            </div>
+                            <div class="booking-total">
+                                <span class="total-label">Tổng cộng:</span>
+                                <span class="total-value">${formatMoney(total)} ₫</span>
+                            </div>
+                            <div class="booking-actions">
+                                <button class="action-btn" onclick="viewDetail('${escapeHtml(bookingCode)}')">Chờ xác nhận</button>
+                                <a class="detail-link" onclick="viewDetail('${escapeHtml(bookingCode)}')">
+                                    Chi tiết →
+                                </a>
+                            </div>
+                           
+                        `;
+                container.appendChild(card);
+            });
+        }
+
+        async function viewDetail(bookingCode) {
+            if (!bookingCode) {
+                alert('Không tìm thấy mã booking.');
+                return;
+            }
+
+            const overlay = document.getElementById('modalOverlay');
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('modalContent');
+
+            overlay.style.display = 'block';
+            modal.style.display = 'block';
+            content.innerHTML = '<p>Đang tải chi tiết...</p>';
+
+            try {
+                const url = `${API_BASE}/bycode/${encodeURIComponent(bookingCode)}`;
+                const resp = await fetch(url);
+                if (resp.status === 404) {
+                    content.innerHTML = `<p>Không tìm thấy booking với mã <strong>${escapeHtml(bookingCode)}</strong>.</p>`;
+                    return;
+                }
+                if (!resp.ok) throw new Error('Lỗi khi gọi API: ' + resp.status);
+
+                const b = await resp.json();
+
+                const bookingId = b.bookingId ?? b.BookingId ?? '';
+                const bookingCodeResp = b.bookingCode ?? b.BookingCode ?? bookingCode;
+                const created = b.createdAt ?? b.CreatedAt ?? b.created_at;
+                const createdStr = created ? new Date(created).toLocaleString('vi-VN') : '';
+                const statusName = b.statusName ?? b.StatusName ?? '';
+                const custId = b.customerId ?? b.CustomerId ?? '';
+                const fullName = b.fullName ?? b.FullName ?? b.Fullname ?? '';
+                const email = b.email ?? b.Email ?? '';
+                const phone = b.phone ?? b.Phone ?? '';
+                const total = b.totalAmount || b.TotalAmount || b.total || 0;
+
+                content.innerHTML = `
+                            <div class="modal-row">
+                                <span class="modal-label">Mã Booking:</span>
+                                <span class="modal-value">${escapeHtml(bookingCodeResp)}</span>
+                            </div>
+                            <div class="modal-row">
+                                <span class="modal-label">ID Booking:</span>
+                                <span class="modal-value">${escapeHtml(bookingId)}</span>
+                            </div>
+                            <div class="modal-row">
+                                <span class="modal-label">Ngày tạo:</span>
+                                <span class="modal-value">${escapeHtml(createdStr)}</span>
+                            </div>
+                            <div class="modal-row">
+                                <span class="modal-label">Trạng thái:</span>
+                                <span class="modal-value">${escapeHtml(statusName)}</span>
+                            </div>
+                            <div class="modal-row">
+                                <span class="modal-label">Tổng tiền:</span>
+                                <span class="modal-value">${formatMoney(total)} ₫</span>
+                            </div>
+                            <div class="modal-section">
+                                <h3>Thông tin khách hàng</h3>
+                                <div class="modal-row">
+                                    <span class="modal-label">ID Khách hàng:</span>
+                                    <span class="modal-value">${escapeHtml(custId)}</span>
+                                </div>
+                                <div class="modal-row">
+                                    <span class="modal-label">Họ tên:</span>
+                                    <span class="modal-value">${escapeHtml(fullName)}</span>
+                                </div>
+                                <div class="modal-row">
+                                    <span class="modal-label">Email:</span>
+                                    <span class="modal-value">${escapeHtml(email)}</span>
+                                </div>
+                                <div class="modal-row">
+                                    <span class="modal-label">SĐT:</span>
+                                    <span class="modal-value">${escapeHtml(phone)}</span>
+                                </div>
+                            </div>
+                        `;
+            } catch (err) {
+                console.error(err);
+                content.innerHTML = `<p style="color: #f44336;">Có lỗi: ${escapeHtml(err.message)}</p>`;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        function deleteBooking(bookingCode) {
+            if (confirm(`Bạn có chắc muốn xóa booking ${bookingCode}?`)) {
+                // Implement delete functionality here
+                console.log('Delete booking:', bookingCode);
+            }
+        }
+
+        function formatMoney(amount) {
+            return new Intl.NumberFormat('vi-VN').format(amount);
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
