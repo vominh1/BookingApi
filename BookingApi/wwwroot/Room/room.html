@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <link rel="stylesheet" href="../layouts/css/style.css">
+    <meta charset="UTF-8" />
+    <title>Quản lý Phòng</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+        }
+
+        .room-card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px;
+            box-shadow: 2px 2px 5px #eee;
+        }
+
+        button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #booking-form {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 2px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <!-- Layout -->
+    <div id="header" style="margin-bottom:60px"></div>
+    <div id="banner"></div>
+    <h1>Danh sách phòng</h1>
+    <div id="room-list">Đang tải danh sách phòng...</div>
+
+    <div id="booking-form" style="display:none;">
+        <h3>Đặt phòng: <span id="room-name"></span></h3>
+        <input type="hidden" id="resource-id">
+
+        <label>Bắt đầu: </label><input type="datetime-local" id="start-time"><br>
+        <label>Kết thúc: </label><input type="datetime-local" id="end-time"><br>
+
+        <button onclick="checkAvailability()">Kiểm tra phòng trống</button>
+        <div id="availability-result"></div>
+    </div>
+    <script src="../Layouts/js/layout.js"></script>
+    <script>
+        const apiBase = "https://localhost:44336/api/rooms";
+
+        // 🏠 Tải danh sách phòng
+        async function loadRooms() {
+            const res = await fetch(apiBase);
+            const rooms = await res.json();
+            const container = document.getElementById('room-list');
+            container.innerHTML = rooms.map(r => `
+                            <div class="room-card">
+                                <h3>${r.name}</h3>
+                                <p>${r.description || 'Không có mô tả'}</p>
+                                <p>📍 Vị trí: ${r.location || 'Chưa rõ'}</p>
+                                <button onclick="openBookingForm(${r.resourceId}, '${r.name}')">Đặt phòng</button>
+                            </div>
+                        `).join('');
+        }
+
+        function openBookingForm(id, name) {
+            document.getElementById('resource-id').value = id;
+            document.getElementById('room-name').innerText = name;
+            document.getElementById('booking-form').style.display = 'block';
+        }
+
+        // ✅ Kiểm tra phòng trống
+        async function checkAvailability() {
+            const id = document.getElementById('resource-id').value;
+            const start = document.getElementById('start-time').value;
+            const end = document.getElementById('end-time').value;
+
+            if (!id || !start || !end) {
+                alert("⚠️ Bạn phải chọn phòng và thời gian bắt đầu/kết thúc!");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${apiBase}/available?resourceId=${id}&start=${start}&end=${end}`);
+                const data = await res.json();
+
+                const result = document.getElementById('availability-result');
+                if (data.available) {
+                    result.innerHTML = `<p style="color:green">
+                                    ✅ Phòng trống.<br>
+                                    <button onclick="confirmBooking(${id}, \`${start}\`, \`${end}\`)">Xác nhận đặt</button>
+                                </p>`;
+                } else {
+                    result.innerHTML = `<p style="color:red">❌ Phòng đã được đặt trong thời gian này.</p>`;
+                }
+            } catch (error) {
+                console.error("❌ Lỗi khi gọi API:", error);
+                alert("Không thể kiểm tra phòng trống. Vui lòng thử lại!");
+            }
+        }
+
+
+        async function confirmBooking(id, start, end) {
+            const bookingData = {
+                resourceId: id,
+                startAt: start,
+                endAt: end,
+                price: 0,
+                quantity: 1,
+                note: "Đặt qua website demo"
+            };
+
+            try {
+                const res = await fetch("https://localhost:44336/api/rooms/book", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(bookingData)
+                });
+
+                const data = await res.json();
+                console.log(data);
+
+                if (res.ok) {
+                    alert(data.message);
+                    document.getElementById('booking-form').style.display = 'none';
+                } else {
+                    alert(data.message || "⚠️ Lỗi khi đặt phòng");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("❌ Không thể gửi yêu cầu đặt phòng!");
+            }
+        }
+
+
+        loadRooms();
+    </script>
+</body>
+</html>

@@ -1,19 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BookingApi.Models;
+
 using Microsoft.EntityFrameworkCore;
 
+using BookingApi.Models;
 namespace BookingApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class BookingController : ControllerBase
     {
-        private readonly BookingDBContext _context;
+        private readonly BookingApi.Models.BookingDBContext _context;
 
-        public BookingController(BookingDBContext context)
+        public BookingController(BookingApi.Models.BookingDBContext context)
         {
             _context = context;
         }
+
 
         // Lấy danh sách booking
         [HttpGet]
