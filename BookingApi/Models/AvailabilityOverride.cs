@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookingApi.Models;
 
 public partial class AvailabilityOverride
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int OverrideId { get; set; }
 
     public int ResourceId { get; set; }
@@ -17,5 +21,7 @@ public partial class AvailabilityOverride
 
     public string? Note { get; set; }
 
-    public virtual Resource Resource { get; set; } = null!;
+    public virtual Resource? Resource { get; set; }
+
+
 }

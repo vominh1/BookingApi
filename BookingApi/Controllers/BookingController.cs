@@ -40,7 +40,6 @@ namespace BookingApi.Controllers
 
 
         // xem chi tiết booking theo mã booking
-
         [HttpGet("bycode/{bookingCode}")]
         public IActionResult GetBookingByCode(string bookingCode)
         {
@@ -54,13 +53,31 @@ namespace BookingApi.Controllers
                 if (result == null)
                     return NotFound(new { message = "Không tìm thấy booking." });
 
-                return Ok(result);
+                // 🔹 Lấy danh sách dịch vụ đi kèm
+                var services = (from bs in _context.BookingServices
+                                join s in _context.Services on bs.ServiceId equals s.ServiceId
+                                where bs.BookingId == result.BookingId
+                                select new
+                                {
+                                    s.ServiceId,
+                                    s.Name,
+                                    s.Price,
+                                    bs.Quantity,
+                                    bs.UnitPrice
+                                }).ToList();
+
+                return Ok(new
+                {
+                    Booking = result,
+                    Services = services
+                });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = ex.Message });
             }
         }
+
 
 
 
@@ -161,5 +178,19 @@ namespace BookingApi.Controllers
             _context.SaveChanges();
             return NoContent();
         }
+
+        // Kiểm tra mã booking tồn tại
+        [HttpGet("bycode2/{bookingCode}")]
+        public IActionResult GetBookingByCode2(string bookingCode)  
+        {
+            var booking = _context.Bookings.FirstOrDefault(b => b.BookingCode == bookingCode);
+            if (booking == null)
+                return NotFound(new { message = "Không tìm thấy mã booking." });
+
+            return Ok(new { message = "✅ Booking tồn tại", booking.BookingId });
+        }
+
     }
+
+
 }

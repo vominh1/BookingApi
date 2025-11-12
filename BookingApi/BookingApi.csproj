@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Booking\NewFolder\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\Layouts\css\style.css" />
     <None Include="wwwroot\Layouts\js\layout.js" />
   </ItemGroup>

@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
+
 
 
 [Route("api/[controller]")]
@@ -16,6 +17,8 @@ public class RoomsController : ControllerBase
         _context = context;
     }
 
+
+
     // 🏠 Lấy danh sách phòng
     [HttpGet]
     public IActionResult GetAllRooms()
@@ -26,20 +29,21 @@ public class RoomsController : ControllerBase
             r.Name,
             r.Description,
             r.Location,
+            r.Price,
         }).ToList();
 
         return Ok(rooms);
     }
     [HttpGet("available")]
-    public IActionResult CheckAvailable(int resourceId,DateTime start ,DateTime end)
+    public IActionResult CheckAvailable(int resourceId, DateTime start, DateTime end, decimal price)
     {
-        if (start>=end )
+        if (start >= end)
         {
             return BadRequest(new { message = "⛔ Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc!" });
         }
 
-        var conflict = _context.BookingItems.Any(b => b.ResourceId == resourceId && (start >= b.StartAt && start < b.EndAt || end > b.StartAt && end <= b.EndAt || start <= b.StartAt && end >=b.EndAt));
-        return Ok(new { available = !conflict}) ;
+        var conflict = _context.BookingItems.Any(b => b.ResourceId == resourceId && (start >= b.StartAt && start < b.EndAt || end > b.StartAt && end <= b.EndAt || start <= b.StartAt && end >= b.EndAt));
+        return Ok(new { available = !conflict });
     }
 
     [HttpPost("book")]
@@ -71,12 +75,10 @@ public class RoomsController : ControllerBase
 
         try
         {
-            // ✅ Gọi stored procedure CreateBooking
             var bookingId = _context.Database.SqlQuery<int>(
-                $"EXEC CreateBooking @BookingCode = '{bookingCode}', @CustomerId = 1, @UserId = 1, @Note = '{dto.Note ?? ""}'"
-            ).AsEnumerable().FirstOrDefault();
+     $"EXEC CreateBooking @BookingCode = '{bookingCode}', @CustomerId = 1, @UserId = 1,@TotalAmount={dto.Price * dto.Quantity}, @Note = '{dto.Note ?? ""}'"
+ ).AsEnumerable().FirstOrDefault();
 
-            // ✅ Lưu BookingItem mới
             var newItem = new BookingItem
             {
                 BookingId = bookingId,
@@ -97,12 +99,70 @@ public class RoomsController : ControllerBase
                 bookingId,
                 bookingCode
             });
-        }   
+        }
         catch (Exception ex)
         {
             return StatusCode(500, new { message = $"💥 Lỗi khi đặt phòng: {ex.Message}" });
         }
+
+    }
+    [HttpGet("bycode/{bookingCode}/items")]
+    public IActionResult GetBookingItemsByCode(string bookingCode)
+    {
+        try
+        {
+            // 🔹 Lấy danh sách phòng thuộc booking có BookingCode tương ứng
+            var items = _context.BookingItems
+                .Include(b => b.Resource) // Lấy thêm thông tin phòng
+                .Include(b => b.Booking)  // Để lọc theo BookingCode
+                .Where(b => b.Booking.BookingCode == bookingCode)
+                .Select(b => new
+                {
+                    b.BookingItemId,
+                    b.ResourceId,
+                    ResourceName = b.Resource.Name,
+                    b.StartAt,
+                    b.EndAt,
+                    b.Price,
+                    b.Quantity,
+                    b.Note
+                })
+                .ToList();
+
+            if (!items.Any())
+                return NotFound(new { message = "❌ Không tìm thấy phòng trong booking này!" });
+
+            return Ok(items);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message });
+
+
+
+        }
     }
 
+    [HttpGet("list")]
+    public async Task<IActionResult> GetResources()
+    {
+        try
+        {
+            var list = await _context.Resources
+                .Select(r => new
+                {
+                    r.ResourceId,
+                    r.Name
+                })
+                .OrderBy(r => r.Name)
+                .ToListAsync();
+
+            return Ok(list);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Lỗi server: " + ex.Message });
+        }
+    }
 
 }

@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Quản lý khóa phòng</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        label {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+        }
+
+        input, textarea, select {
+            padding: 6px;
+            width: 250px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 8px 15px;
+            background: #007bff;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background: #0056b3;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            .delete-btn:hover {
+                background: #b02a37;
+            }
+    </style>
+</head>
+<body>
+    <h1>🔒 Quản lý Khóa Phòng</h1>
+
+    <form id="overrideForm">
+        <div>
+            <label>Chọn phòng:</label>
+            <select id="resourceSelect" required>
+                <option value="">-- Chọn phòng --</option>
+            </select>
+        </div>
+        <div>
+            <label>Bắt đầu:</label>
+            <input type="datetime-local" id="startAt" required>
+        </div>
+        <div>
+            <label>Kết thúc:</label>
+            <input type="datetime-local" id="endAt" required>
+        </div>
+        <div>
+            <label>Lý do:</label>
+            <textarea id="reason" rows="2"></textarea>
+        </div>
+        <button type="submit">Khóa phòng</button>
+    </form>
+
+    <h2>Danh sách khóa phòng</h2>
+    <table id="overridesTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên phòng</th>
+                <th>Bắt đầu</th>
+                <th>Kết thúc</th>
+                <th>Lý do</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const apiBase = "https://localhost:44336/api/overrides";
+        const apiResource = "https://localhost:44336/api/Rooms/list";
+
+        // 🔹 Tải danh sách phòng
+        async function loadResources() {
+            try {
+                const res = await fetch(apiResource);
+                if (!res.ok) throw new Error("Không thể tải danh sách phòng.");
+
+                const data = await res.json();
+                const select = document.getElementById('resourceSelect');
+                select.innerHTML = '<option value="">-- Chọn phòng --</option>';
+
+                data.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = r.resourceId;
+                    opt.textContent = r.name; // ✅ đúng field
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                console.error("Lỗi loadResources:", err);
+                alert("Không thể tải danh sách phòng.");
+            }
+        }
+
+        // 🔹 Tải danh sách khóa phòng
+        async function loadOverrides() {
+            const resourceId = document.getElementById('resourceSelect').value;
+            if (!resourceId) return;
+
+            try {
+                const res = await fetch(`${apiBase}?resourceId=${resourceId}`);
+                if (!res.ok) {
+                    console.error("Lỗi tải danh sách:", res.status);
+                    alert("Không thể tải danh sách khóa phòng.");
+                    return;
+                }
+
+                const data = await res.json();
+                const tbody = document.querySelector('#overridesTable tbody');
+                tbody.innerHTML = "";
+
+                data.forEach(o => {
+                    const row = `
+                            <tr>
+                                <td>${o.overrideId}</td>
+                                <td>${o.name || "Không rõ"}</td>
+                                <td>${new Date(o.startAt).toLocaleString()}</td>
+                                <td>${new Date(o.endAt).toLocaleString()}</td>
+                                <td>${o.note || ""}</td>
+                                <td>${o.isAvailable ? "🟢 Mở" : "🔴 Khóa"}</td>
+                                <td>
+                                    <button class="delete-btn" onclick="deleteOverride(${o.overrideId}, ${o.resourceId})">
+                                        Bỏ khóa
+                                    </button>
+                                </td>
+                            </tr>`;
+                    tbody.innerHTML += row;
+                });
+            } catch (err) {
+                console.error("Lỗi loadOverrides:", err);
+                alert("Lỗi kết nối đến API.");
+            }
+        }
+
+        // 🔹 Tạo khóa phòng
+        document.getElementById('overrideForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const resourceId = parseInt(document.getElementById('resourceSelect').value);
+            const startAt = document.getElementById('startAt').value;
+            const endAt = document.getElementById('endAt').value;
+            const note = document.getElementById('reason').value;
+
+            if (!resourceId || !startAt || !endAt) {
+                alert("Vui lòng nhập đầy đủ thông tin!");
+                return;
+            }
+
+            const payload = {
+                resourceId,
+                startAt: new Date(startAt).toISOString(),
+                endAt: new Date(endAt).toISOString(),
+                isAvailable: false,
+                note
+            };
+
+            try {
+                const res = await fetch(apiBase, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert("✅ Phòng đã được khóa thành công!");
+                    loadOverrides();
+                    return;
+                }
+
+                let message = "Đã xảy ra lỗi khi khóa phòng.";
+                try {
+                    const errObj = await res.json();
+                    message = errObj.message || JSON.stringify(errObj);
+                } catch {
+                    message = await res.text();
+                }
+                alert("⚠️ " + message);
+            } catch (err) {
+                console.error("Lỗi gửi POST:", err);
+                alert("Lỗi kết nối đến API.");
+            }
+        });
+
+        // 🔹 Xóa khóa phòng
+        async function deleteOverride(id, resourceId) {
+            if (!confirm("Bạn có chắc muốn bỏ khóa phòng này không?")) return;
+
+            try {
+                const res = await fetch(`${apiBase}/${id}`, { method: "DELETE" });
+                if (res.ok) {
+                    alert("✅ Đã bỏ khóa phòng!");
+                    document.getElementById("resourceSelect").value = resourceId;
+                    loadOverrides();
+                } else {
+                    const errText = await res.text();
+                    alert("⚠️ Lỗi khi bỏ khóa: " + errText);
+                }
+            } catch (err) {
+                console.error("Lỗi DELETE:", err);
+                alert("Lỗi kết nối đến API khi bỏ khóa.");
+            }
+        }
+
+        // 🔹 Khi chọn phòng → tải danh sách khóa
+        document.getElementById('resourceSelect').addEventListener('change', loadOverrides);
+        window.addEventListener("DOMContentLoaded", loadResources);
+    </script>
+</body>
+</html>

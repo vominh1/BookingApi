@@ -3,52 +3,384 @@
 <head>
     <link rel="stylesheet" href="../layouts/css/style.css">
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Phòng</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial;
-            margin: 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        #header {
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin: 30px 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            color: #667eea;
+            margin: 30px 0 20px 0;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        #room-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .room-card {
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 10px;
-            box-shadow: 2px 2px 5px #eee;
+            background: white;
+            border: none;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+
+            .room-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 5px;
+                background: linear-gradient(90deg, #667eea, #764ba2);
+            }
+
+            .room-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            }
+
+            .room-card h3 {
+                font-size: 1.6em;
+                margin-bottom: 15px;
+                color: #333;
+            }
+
+            .room-card p {
+                color: #666;
+                margin: 12px 0;
+                line-height: 1.8;
+                font-size: 1.05em;
+            }
+
+                .room-card p#price {
+                    color: #667eea;
+                    font-size: 1.4em;
+                    font-weight: bold;
+                    margin: 15px 0;
+                }
 
         button {
-            padding: 5px 10px;
-            border-radius: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 30px;
             cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            width: 100%;
+            margin-top: 15px;
         }
 
+            button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+            }
+
+            button:active {
+                transform: translateY(-1px);
+            }
+
         #booking-form {
-            margin-top: 20px;
-            padding-top: 10px;
-            border-top: 2px solid #eee;
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            margin: 30px auto;
+            max-width: 700px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-top: 5px solid;
+            border-image: linear-gradient(90deg, #667eea, #764ba2) 1;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin: 20px 0 8px 0;
+            font-size: 1.05em;
+        }
+
+        input[type="number"],
+        input[type="datetime-local"],
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+            input[type="number"]:focus,
+            input[type="datetime-local"]:focus,
+            input[type="text"]:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            }
+
+        input[readonly] {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        #availability-result {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.1em;
+        }
+
+            #availability-result p {
+                margin: 0;
+                line-height: 1.8;
+            }
+
+        hr {
+            border: none;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            margin: 50px auto;
+            max-width: 1400px;
+            border-radius: 2px;
+        }
+
+        .booking-search-section {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            margin: 30px auto;
+            max-width: 1400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+            .search-container input {
+                flex: 1;
+            }
+
+            .search-container button {
+                flex: 0 0 auto;
+                width: auto;
+                margin-top: 0;
+                padding: 14px 35px;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+            table th {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 16px;
+                text-align: left;
+                font-weight: 600;
+                font-size: 1.05em;
+            }
+
+            table td {
+                padding: 14px 16px;
+                border-bottom: 1px solid #f0f0f0;
+                color: #333;
+            }
+
+            table tr:hover {
+                background: #f8f9ff;
+            }
+
+            table tr:last-child td {
+                border-bottom: none;
+            }
+
+            table td#price {
+                color: #667eea;
+                font-weight: bold;
+                font-size: 1.1em;
+            }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            #room-list {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+                .search-container button {
+                    width: 100%;
+                }
+
+            table {
+                font-size: 0.9em;
+            }
+
+                table th,
+                table td {
+                    padding: 10px 8px;
+                }
+        }
+
+        /* Loading animation */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+           
         }
     </style>
 </head>
 <body>
     <!-- Layout -->
-    <div id="header" style="margin-bottom:60px"></div>
+    <div id="header"></div>
     <div id="banner"></div>
-    <h1>Danh sách phòng</h1>
-    <div id="room-list">Đang tải danh sách phòng...</div>
+
+    <h1>🏨 Danh sách phòng</h1>
+    <div id="room-list" class="loading">Đang tải danh sách phòng...</div>
 
     <div id="booking-form" style="display:none;">
-        <h3>Đặt phòng: <span id="room-name"></span></h3>
+        <h3>📅 Đặt phòng: <span id="room-name"></span></h3>
         <input type="hidden" id="resource-id">
+        <label>💰 Giá phòng (VNĐ):</label>
+        <input type="number" id="room-price" readonly /><br>
+        <label>📆 Bắt đầu:</label>
+        <input type="datetime-local" id="start-time"><br>
+        <label>📆 Kết thúc:</label>
+        <input type="datetime-local" id="end-time"><br>
 
-        <label>Bắt đầu: </label><input type="datetime-local" id="start-time"><br>
-        <label>Kết thúc: </label><input type="datetime-local" id="end-time"><br>
-
-        <button onclick="checkAvailability()">Kiểm tra phòng trống</button>
+        <button onclick="checkAvailability()">🔍 Kiểm tra phòng trống</button>
         <div id="availability-result"></div>
     </div>
+
+    <hr>
+
+    <div class="booking-search-section">
+        <h2>🔍 Xem các phòng trong Booking</h2>
+        <div class="search-container">
+            <input type="text" id="booking-code" placeholder="Nhập mã Booking (VD: BK00123)" />
+            <button onclick="loadBookingItems()">🔎 Xem</button>
+        </div>
+        <div id="booking-items"></div>
+    </div>
+
     <script src="../Layouts/js/layout.js"></script>
+    <script>
+        async function loadBookingItems() {
+            const id = document.getElementById('booking-code').value;
+            if (!id) {
+                alert("⚠️ Nhập Booking code để xem chi tiết!");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${apiBase}/bycode/${id}/items`);
+                if (!res.ok) {
+                    alert("❌ Không tìm thấy dữ liệu cho Booking này!");
+                    return;
+                }
+                const items = await res.json();
+                const container = document.getElementById('booking-items');
+                container.innerHTML = `
+                    <table border="1" cellpadding="5">
+                        <tr>
+                            <th>🏠 Phòng</th>
+                            <th>📅 Bắt đầu</th>
+                            <th>📅 Kết thúc</th>
+                            <th>💰 Giá</th>
+                            <th>📝 Ghi chú</th>
+                        </tr>
+                        ${items.map(i => `
+                            <tr>
+                                <td>${i.resourceName}</td>
+                                <td>${new Date(i.startAt).toLocaleString()}</td>
+                                <td>${new Date(i.endAt).toLocaleString()}</td>
+                                <td id="price">${i.price}</td>
+                                <td>${i.note || ''}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+            } catch (error) {
+                console.error(error);
+                alert("💥 Lỗi khi tải danh sách phòng!");
+            }
+        }
+
+    </script>
     <script>
         const apiBase = "https://localhost:44336/api/rooms";
 
@@ -58,19 +390,24 @@
             const rooms = await res.json();
             const container = document.getElementById('room-list');
             container.innerHTML = rooms.map(r => `
-                            <div class="room-card">
-                                <h3>${r.name}</h3>
-                                <p>${r.description || 'Không có mô tả'}</p>
-                                <p>📍 Vị trí: ${r.location || 'Chưa rõ'}</p>
-                                <button onclick="openBookingForm(${r.resourceId}, '${r.name}')">Đặt phòng</button>
-                            </div>
-                        `).join('');
+                    <div class="room-card">
+                        <h3>🏠 ${r.name}</h3>
+                        <p id="price">💰 Giá: ${r.price} ₫</p>
+                        <p>${r.description || 'Không có mô tả'}</p>
+                        <p>📍 Vị trí: ${r.location || 'Chưa rõ'}</p>
+                        <button onclick="openBookingForm(${r.resourceId}, '${r.name}', ${r.price})">
+                            📅 Đặt phòng
+                        </button>
+                    </div>
+                `).join('');
         }
 
-        function openBookingForm(id, name) {
+        function openBookingForm(id, name, price) {
             document.getElementById('resource-id').value = id;
             document.getElementById('room-name').innerText = name;
+            document.getElementById('room-price').value = price;
             document.getElementById('booking-form').style.display = 'block';
+            document.getElementById('booking-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         // ✅ Kiểm tra phòng trống
@@ -78,6 +415,7 @@
             const id = document.getElementById('resource-id').value;
             const start = document.getElementById('start-time').value;
             const end = document.getElementById('end-time').value;
+            const price = document.getElementById('room-price').value;
 
             if (!id || !start || !end) {
                 alert("⚠️ Bạn phải chọn phòng và thời gian bắt đầu/kết thúc!");
@@ -90,11 +428,19 @@
 
                 const result = document.getElementById('availability-result');
                 if (data.available) {
+                    result.style.background = '#d4edda';
+                    result.style.color = '#155724';
+                    result.style.border = '2px solid #c3e6cb';
                     result.innerHTML = `<p style="color:green">
-                                    ✅ Phòng trống.<br>
-                                    <button onclick="confirmBooking(${id}, \`${start}\`, \`${end}\`)">Xác nhận đặt</button>
-                                </p>`;
+                            ✅ Phòng trống.<br>
+                            <button onclick="confirmBooking(${id}, \`${start}\`, \`${end}\`, ${price})" style="margin-top:15px;">
+                                ✔️ Xác nhận đặt
+                            </button>
+                        </p>`;
                 } else {
+                    result.style.background = '#f8d7da';
+                    result.style.color = '#721c24';
+                    result.style.border = '2px solid #f5c6cb';
                     result.innerHTML = `<p style="color:red">❌ Phòng đã được đặt trong thời gian này.</p>`;
                 }
             } catch (error) {
@@ -103,13 +449,12 @@
             }
         }
 
-
-        async function confirmBooking(id, start, end) {
+        async function confirmBooking(id, start, end, price) {
             const bookingData = {
                 resourceId: id,
                 startAt: start,
                 endAt: end,
-                price: 0,
+                price: price,
                 quantity: 1,
                 note: "Đặt qua website demo"
             };
@@ -125,7 +470,7 @@
                 console.log(data);
 
                 if (res.ok) {
-                    alert(data.message);
+                    alert("✅ " + data.message);
                     document.getElementById('booking-form').style.display = 'none';
                 } else {
                     alert(data.message || "⚠️ Lỗi khi đặt phòng");
@@ -135,7 +480,6 @@
                 alert("❌ Không thể gửi yêu cầu đặt phòng!");
             }
         }
-
 
         loadRooms();
     </script>

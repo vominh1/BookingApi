@@ -1,0 +1,391 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thêm dịch vụ vào Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+            .search-box label {
+                font-size: 16px;
+                font-weight: 600;
+                color: #333;
+            }
+
+        #bookingCode {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+            #bookingCode:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+        .btn-primary {
+            padding: 15px 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            }
+
+            .btn-primary:active {
+                transform: translateY(0);
+            }
+
+        #service-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+            .service-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+                border-color: #667eea;
+            }
+
+            .service-card h3 {
+                color: #333;
+                font-size: 22px;
+                margin-bottom: 12px;
+                font-weight: 700;
+            }
+
+            .service-card p {
+                color: #666;
+                line-height: 1.6;
+                margin-bottom: 10px;
+                min-height: 48px;
+            }
+
+        .price {
+            color: #667eea;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .quantity-control {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+            .quantity-control input {
+                flex: 1;
+                padding: 12px;
+                border: 2px solid #e0e0e0;
+                border-radius: 10px;
+                font-size: 16px;
+                text-align: center;
+                transition: all 0.3s ease;
+            }
+
+                .quantity-control input:focus {
+                    border-color: #667eea;
+                    outline: none;
+                }
+
+        .btn-add {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        }
+
+            .btn-add:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+            }
+
+            .btn-add:active {
+                transform: translateY(0);
+            }
+
+        .loading-state {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .modal.show {
+                display: flex;
+            }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .btn-close {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 24px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            #bookingCode {
+                width: 100%;
+            }
+
+            .btn-primary {
+                width: 100%;
+            }
+
+            #service-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Chọn dịch vụ thêm cho Booking</h1>
+            <div class="search-box">
+                <label>📋 Mã Booking:</label>
+                <input type="text" id="bookingCode" placeholder="VD: BK202511090001" />
+                <button class="btn-primary" onclick="checkBooking()">🔍 Xem dịch vụ</button>
+            </div>
+        </div>
+
+        <div id="service-list">
+            <div class="loading-state">💡 Nhập mã Booking để xem danh sách dịch vụ</div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Thông báo</h2>
+            <p id="modal-message"></p>
+            <button class="btn-close" onclick="closeModal()">Đóng</button>
+        </div>
+    </div>
+
+    <script>
+        const baseUrl = "https://localhost:44336/api";
+
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        async function checkBooking() {
+            const code = document.getElementById('bookingCode').value.trim();
+            if (!code) {
+                showModal('⚠️ Lỗi', 'Vui lòng nhập mã Booking Code');
+                return;
+            }
+
+            document.getElementById('service-list').innerHTML = '<div class="loading-state">⏳ Đang tải dữ liệu...</div>';
+
+            try {
+                const resCheck = await fetch(`${baseUrl}/booking/bycode2/${code}`);
+                if (!resCheck.ok) {
+                    showModal('❌ Lỗi', 'Không tìm thấy mã booking này!');
+                    document.getElementById('service-list').innerHTML = '<div class="loading-state">❌ Không tìm thấy booking</div>';
+                    return;
+                }
+
+                const res = await fetch(`${baseUrl}/services`);
+                const data = await res.json();
+
+                const html = data.map(s => `
+                        <div class="service-card">
+                            <h3>${s.name}</h3>
+                            <p>${s.description || 'Dịch vụ chất lượng cao'}</p>
+                            <div class="price">💰 ${s.price.toLocaleString()} VND</div>
+                            <div class="quantity-control">
+                                <input type="number" id="qty-${s.serviceId}" placeholder="Số lượng" min="1" value="1" />
+                            </div>
+                            <button class="btn-add" onclick="addService('${code}', ${s.serviceId})">➕ Thêm dịch vụ</button>
+                        </div>
+                    `).join('');
+
+                document.getElementById('service-list').innerHTML = html;
+            } catch (error) {
+                showModal('❌ Lỗi', 'Có lỗi xảy ra khi tải dữ liệu!');
+                document.getElementById('service-list').innerHTML = '<div class="loading-state">❌ Lỗi kết nối</div>';
+            }
+        }
+
+        async function addService(bookingCode, serviceId) {
+            const qtyInput = document.getElementById(`qty-${serviceId}`);
+            const qty = qtyInput.value;
+
+            if (!qty || qty < 1) {
+                showModal('⚠️ Lỗi', 'Vui lòng nhập số lượng hợp lệ!');
+                return;
+            }
+
+            const body = {
+                bookingCode: bookingCode,
+                serviceId: serviceId,
+                quantity: parseInt(qty)
+            };
+
+            try {
+                const res = await fetch(`${baseUrl}/bookingservices`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await res.json();
+                showModal('✅ Thành công', `${data.message}\n💰 Tổng tiền mới: ${data.totalAmount.toLocaleString()} VND`);
+            } catch (error) {
+                showModal('❌ Lỗi', 'Có lỗi xảy ra khi thêm dịch vụ!');
+            }
+        }
+
+        // Allow Enter key to trigger search
+        document.getElementById('bookingCode').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkBooking();
+            }
+        });
+    </script>
+</body>
+</html>
