@@ -1,0 +1,421 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Người dùng & Vai trò</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+            .header h1 {
+                color: #667eea;
+                font-size: 2.5em;
+                font-weight: 700;
+                margin-bottom: 10px;
+            }
+
+            .header p {
+                color: #666;
+                font-size: 1.1em;
+            }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            }
+
+            .card h2 {
+                color: #333;
+                font-size: 1.8em;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 3px solid #667eea;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                font-weight: 600;
+                color: #555;
+                margin-bottom: 8px;
+                font-size: 0.95em;
+            }
+
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 12px 15px;
+                border: 2px solid #e0e0e0;
+                border-radius: 10px;
+                font-size: 1em;
+                transition: all 0.3s ease;
+                background: #f8f9fa;
+            }
+
+                .form-group input:focus,
+                .form-group select:focus {
+                    outline: none;
+                    border-color: #667eea;
+                    background: white;
+                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                }
+
+            .form-group select {
+                height: 120px;
+            }
+
+        button {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+            button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            }
+
+            button:active {
+                transform: translateY(0);
+            }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 18px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .token-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            color: #28a745;
+            font-size: 0.9em;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 968px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .icon {
+            font-size: 1.3em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 Hệ thống Quản lý Users & Roles</h1>
+            <p>Quản lý người dùng và phân quyền một cách chuyên nghiệp</p>
+        </div>
+
+        <div class="grid">
+            <div>
+                <div class="card">
+                    <h2><span class="icon">➕</span> Thêm người dùng mới</h2>
+                    <form id="userForm">
+                        <div class="form-group">
+                            <label>Tên đăng nhập</label>
+                            <input type="text" id="username" required placeholder="Nhập tên đăng nhập">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="email" placeholder="example@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu</label>
+                            <input type="password" id="password" required placeholder="Nhập mật khẩu">
+                        </div>
+                        <div class="form-group">
+                            <label>Họ và tên</label>
+                            <input type="text" id="fullName" placeholder="Nhập họ tên đầy đủ">
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại</label>
+                            <input type="text" id="phone" placeholder="0123456789">
+                        </div>
+                        <div class="form-group">
+                            <label>Chọn vai trò (có thể chọn nhiều)</label>
+                            <select id="roles" multiple required></select>
+                        </div>
+                        <button type="submit">Tạo người dùng mới</button>
+                    </form>
+                </div>
+
+                <div class="card" style="margin-top: 30px;">
+                    <h2><span class="icon">🔐</span> Đăng nhập</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label>Tài khoản hoặc Email</label>
+                            <input type="text" id="loginUser" required placeholder="Username hoặc Email">
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu</label>
+                            <input type="password" id="loginPass" required placeholder="Nhập mật khẩu">
+                        </div>
+                        <button type="submit">Đăng nhập hệ thống</button>
+                    </form>
+                    <div id="tokenDisplay" class="token-display" style="display: none;"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><span class="icon">📋</span> Danh sách người dùng</h2>
+                <div class="table-container">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Email</th>
+                                <th>Họ tên</th>
+                                <th>Vai trò</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = "https://localhost:44336/api";
+        let jwtToken = "";
+
+        function showNotification(message, type = 'success') {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert ${alertClass}`;
+            alertDiv.textContent = message;
+            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.grid'));
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        async function loadRoles() {
+            try {
+                const res = await fetch(`${apiBase}/roles`);
+                const roles = await res.json();
+                const select = document.getElementById("roles");
+                select.innerHTML = "";
+                roles.forEach(r => {
+                    const opt = document.createElement("option");
+                    opt.value = r.roleId;
+                    opt.textContent = r.roleName;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                console.error("Lỗi tải roles:", err);
+                showNotification("Không thể tải danh sách roles.", 'error');
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const res = await fetch(`${apiBase}/users`);
+                const data = await res.json();
+                const tbody = document.querySelector("#usersTable tbody");
+                tbody.innerHTML = "";
+                data.forEach(u => {
+                    const rolesHtml = u.roles.map(r => `<span class="badge">${r}</span>`).join(' ');
+                    const row = `
+                            <tr>
+                                <td><strong>${u.userId}</strong></td>
+                                <td>${u.username}</td>
+                                <td>${u.email || '<em>Chưa có</em>'}</td>
+                                <td>${u.fullName || '<em>Chưa có</em>'}</td>
+                                <td>${rolesHtml}</td>
+                            </tr>`;
+                    tbody.innerHTML += row;
+                });
+            } catch (err) {
+                console.error("Lỗi tải users:", err);
+                showNotification("Không thể tải danh sách users.", 'error');
+            }
+        }
+
+        document.getElementById("userForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const fullName = document.getElementById("fullName").value;
+            const phone = document.getElementById("phone").value;
+            const selectedRoles = Array.from(document.getElementById("roles").selectedOptions).map(o => parseInt(o.value));
+
+            const payload = { username, email, password, fullName, phone, roleIds: selectedRoles };
+
+            try {
+                const res = await fetch(`${apiBase}/users`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showNotification(data.message);
+                    document.getElementById("userForm").reset();
+                    loadUsers();
+                } else {
+                    showNotification(data.message || "Lỗi tạo user.", 'error');
+                }
+            } catch (err) {
+                console.error("Lỗi thêm user:", err);
+                showNotification("Lỗi kết nối tới API.", 'error');
+            }
+        });
+
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const usernameOrEmail = document.getElementById("loginUser").value;
+            const password = document.getElementById("loginPass").value;
+            try {
+                const res = await fetch(`${apiBase}/auth/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ usernameOrEmail, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    jwtToken = data.token;
+                    const tokenDisplay = document.getElementById("tokenDisplay");
+                    tokenDisplay.style.display = 'block';
+                    tokenDisplay.innerHTML = `<strong>🎫 JWT Token:</strong><br>${jwtToken}`;
+                    showNotification("Đăng nhập thành công!");
+                } else {
+                    showNotification(data.message || "Sai tài khoản hoặc mật khẩu.", 'error');
+                }
+            } catch (err) {
+                console.error("Lỗi đăng nhập:", err);
+                showNotification("Lỗi kết nối API.", 'error');
+            }
+        });
+
+        window.addEventListener("DOMContentLoaded", () => {
+            loadRoles();
+            loadUsers();
+        });
+    </script>
+</body>
+</html>
