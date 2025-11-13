@@ -2,168 +2,433 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💳 Quản lý Thanh Toán</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f9fafb;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        h1, h2 {
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+            .header h1 {
+                color: #667eea;
+                font-size: 2.5em;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 15px;
+            }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+            }
+
+        .card-title {
+            font-size: 1.5em;
             color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
         }
 
-        form {
-            background: #ffffff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        label {
-            display: inline-block;
-            width: 140px;
-            font-weight: bold;
-        }
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                color: #555;
+                font-weight: 600;
+                font-size: 0.95em;
+            }
 
-        input, select {
-            padding: 6px;
-            width: 250px;
-            margin-bottom: 10px;
-        }
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 12px 16px;
+                border: 2px solid #e0e0e0;
+                border-radius: 10px;
+                font-size: 1em;
+                transition: all 0.3s ease;
+                background: white;
+            }
 
-        button {
-            background: #007bff;
+                .form-group input:focus,
+                .form-group select:focus {
+                    outline: none;
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+                }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 8px 14px;
-            border-radius: 5px;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-            button:hover {
-                background: #0056b3;
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+            .search-box input {
+                flex: 1;
+                padding: 12px 16px;
+                border: 2px solid #e0e0e0;
+                border-radius: 10px;
+                font-size: 1em;
+            }
+
+            .search-box button {
+                width: auto;
+                padding: 12px 24px;
             }
 
         table {
             width: 100%;
-            border-collapse: collapse;
-            background: white;
-            margin-top: 15px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        }
-
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            overflow: hidden;
+            border-radius: 10px;
         }
 
         th {
-            background: #007bff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        .report-box {
-            background: #e7f1ff;
             padding: 15px;
-            border-radius: 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .daily-table {
             margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 1.1em;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-cash {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-transfer {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-card {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+            .loading.active {
+                display: block;
+            }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
 <body>
-
-    <h1>💳 Quản lý Thanh Toán</h1>
-
-    <!-- Form ghi nhận thanh toán -->
-    <form id="paymentForm">
-        <h2>Ghi nhận thanh toán</h2>
-        <div>
-            <label>Mã Booking:</label>
-            <input type="text" id="bookingCode" placeholder="VD: BK12345678" required>
+    <div class="container">
+        <div class="header">
+            <h1>💳 Hệ thống Quản lý Thanh Toán</h1>
         </div>
-        <div>
-            <label>Số tiền (VNĐ):</label>
-          
-            <input type="text" id="amount" placeholder="Nhập số tiền..." required>
 
-        </div>
-        <div>
-            <label>Phương thức:</label>
-            <select id="method">
-                <option value="Tiền mặt">Tiền mặt</option>
-                <option value="Chuyển khoản">Chuyển khoản</option>
-                <option value="Thẻ">Thẻ</option>
-            </select>
-        </div>
-        <div>
-            <label>Mã giao dịch:</label>
-            <input  type="text" id="transactionRef" readonly>
-        </div>
-        <button type="submit">💰 Ghi nhận</button>
-    </form>
-
-    <!-- Danh sách thanh toán -->
-    <h2>Danh sách thanh toán</h2>
-    <div>
-        <label>Nhập mã Booking:</label>
-        <input type="text" id="searchBookingCode">
-        <button onclick="loadPayments()">🔍 Xem</button>
-    </div>
-
-    <table id="paymentsTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Số tiền (VNĐ)</th>
-                <th>Phương thức</th>
-                <th>Mã giao dịch</th>
-                <th>Ngày thanh toán</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <!-- Báo cáo doanh thu -->
-    <div class="report-box">
-        <h2>📊 Báo cáo Doanh thu</h2>
-        <form id="reportForm">
-            <div>
-                <label>Từ ngày:</label>
-                <input type="date" id="fromDate" required>
+        <div class="grid">
+            <!-- Form ghi nhận thanh toán -->
+            <div class="card">
+                <h2 class="card-title">➕ Ghi nhận thanh toán mới</h2>
+                <form id="paymentForm">
+                    <div class="form-group">
+                        <label>Mã Booking</label>
+                        <input type="text" id="bookingCode" placeholder="VD: BK12345678" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Số tiền (VNĐ)</label>
+                        <input type="text" id="amount" placeholder="Nhập số tiền..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phương thức thanh toán</label>
+                        <select id="method" required>
+                            <option value="Tiền mặt">💵 Tiền mặt</option>
+                            <option value="Chuyển khoản">🏦 Chuyển khoản</option>
+                            <option value="Thẻ">💳 Thẻ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mã giao dịch</label>
+                        <input type="text" id="transactionRef" readonly>
+                    </div>
+                    <button type="submit" class="btn">💰 Ghi nhận thanh toán</button>
+                </form>
             </div>
-            <div>
-                <label>Đến ngày:</label>
-                <input type="date" id="toDate" required>
-            </div>
-            <button type="submit">📅 Xem báo cáo</button>
-        </form>
 
-        <div id="reportResult"></div>
+            <!-- Danh sách thanh toán -->
+            <div class="card">
+                <h2 class="card-title">📋 Danh sách thanh toán</h2>
+                <div class="search-box">
+                    <input type="text" id="searchBookingCode" placeholder="Nhập mã Booking...">
+                    <button class="btn" onclick="loadPayments()">🔍 Tìm kiếm</button>
+                </div>
+                <div class="loading" id="loadingPayments">⏳ Đang tải...</div>
+                <div style="overflow-x: auto;">
+                    <table id="paymentsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Số tiền</th>
+                                <th>Phương thức</th>
+                                <th>Mã GD</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    Nhập mã Booking để xem danh sách thanh toán
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Báo cáo doanh thu -->
+            <div class="card full-width">
+                <h2 class="card-title">📊 Báo cáo Doanh thu</h2>
+                <form id="reportForm">
+                    <div class="grid">
+                        <div class="form-group">
+                            <label>Từ ngày</label>
+                            <input type="date" id="fromDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Đến ngày</label>
+                            <input type="date" id="toDate" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-secondary">📅 Xem báo cáo</button>
+                </form>
+
+                <div class="loading" id="loadingReport">⏳ Đang tải báo cáo...</div>
+                <div id="reportResult"></div>
+            </div>
+        </div>
     </div>
 
     <script>
         const apiBase = "https://localhost:44336/api/payments";
+
         async function randomTransactionRef() {
             return 'TX' + Math.random().toString(36).substr(2, 9).toUpperCase();
         }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN').format(amount) + ' ₫';
+        }
+
+        function getPaymentBadge(method) {
+            const badges = {
+                'Tiền mặt': 'badge-cash',
+                'Chuyển khoản': 'badge-transfer',
+                'Thẻ': 'badge-card'
+            };
+            return `<span class="badge ${badges[method] || ''}">${method}</span>`;
+        }
+
+        document.getElementById("amount").addEventListener("input", function (e) {
+            let value = e.target.value.replace(/[^\d]/g, "");
+            if (value) {
+                value = parseInt(value, 10).toLocaleString("vi-VN");
+            }
+            e.target.value = value;
+        });
+
+        function parseAmount() {
+            const amountFormatted = document.getElementById("amount").value;
+            const amount = parseFloat(amountFormatted.replace(/\./g, ""));
+            return isNaN(amount) ? 0 : amount;
+        }
+
         document.getElementById("paymentForm").addEventListener("submit", async function (e) {
             e.preventDefault();
             const bookingCode = document.getElementById("bookingCode").value.trim();
-            const amountFormatted = document.getElementById("amount").value;
+            const amount = parseAmount();
             const method = document.getElementById("method").value;
             const transactionRef = document.getElementById("transactionRef").value;
-          
-            const amount = parseAmount() ;
+
+            if (amount <= 0) {
+                alert("❌ Vui lòng nhập số tiền hợp lệ!");
+                return;
+            }
+
             const payLoad = { bookingCode, amount, paymentMethod: method, transactionRef };
-            
+
             try {
                 const res = await fetch(apiBase, {
                     method: "POST",
@@ -174,47 +439,58 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    alert(data.message);
+                    alert("✅ " + data.message);
                     document.getElementById("paymentForm").reset();
+                    document.getElementById("transactionRef").value = await randomTransactionRef();
                 } else {
                     alert("❌ " + (data.message || "Lỗi ghi nhận thanh toán."));
                 }
             } catch (err) {
                 console.error("Lỗi gửi thanh toán:", err);
-                alert("Lỗi kết nối tới API.");
+                alert("❌ Lỗi kết nối tới API.");
             }
         });
 
         async function loadPayments() {
             const bookingCode = document.getElementById("searchBookingCode").value.trim();
             if (!bookingCode) {
-                alert("Vui lòng nhập mã Booking.");
+                alert("⚠️ Vui lòng nhập mã Booking.");
                 return;
             }
+
+            const loading = document.getElementById("loadingPayments");
+            const tbody = document.querySelector("#paymentsTable tbody");
+
+            loading.classList.add("active");
+
             try {
                 const res = await fetch(`${apiBase}?bookingCode=${bookingCode}`);
-
                 const data = await res.json();
-                const tbody = document.querySelector("#paymentsTable tbody");
+
                 tbody.innerHTML = "";
+
                 if (data.length === 0) {
-                    tbody.innerHTML = "<tr><td colspan='5'>Không có thanh toán nào.</td></tr>";
+                    tbody.innerHTML = "<tr><td colspan='5' class='empty-state'>Không tìm thấy thanh toán nào</td></tr>";
                     return;
                 }
+
                 data.forEach(p => {
                     const row = `
-                                            <tr>
-                                                <td>${p.paymentId}</td>
-                                                <td>${p.amount.toLocaleString("vi-VN") }</td>
-                                                <td>${p.paymentMethod}</td>
-                                                <td>${p.transactionRef}</td>
-                                                <td>${new Date(p.paidAt).toLocaleString()}</td>
-                                            </tr>`;
+                            <tr>
+                                <td><strong>#${p.paymentId}</strong></td>
+                                <td><strong>${formatCurrency(p.amount)}</strong></td>
+                                <td>${getPaymentBadge(p.paymentMethod)}</td>
+                                <td><code>${p.transactionRef}</code></td>
+                                <td>${new Date(p.paidAt).toLocaleString('vi-VN')}</td>
+                            </tr>`;
                     tbody.innerHTML += row;
                 });
             } catch (err) {
                 console.error("Lỗi loadPayments:", err);
-                alert("Lỗi kết nối đến API.");
+                alert("❌ Lỗi kết nối đến API.");
+                tbody.innerHTML = "<tr><td colspan='5' class='empty-state'>Lỗi tải dữ liệu</td></tr>";
+            } finally {
+                loading.classList.remove("active");
             }
         }
 
@@ -224,9 +500,15 @@
             const toDate = document.getElementById("toDate").value;
 
             if (!fromDate || !toDate) {
-                alert("Vui lòng chọn đầy đủ ngày.");
+                alert("⚠️ Vui lòng chọn đầy đủ ngày.");
                 return;
             }
+
+            const loading = document.getElementById("loadingReport");
+            const resultDiv = document.getElementById("reportResult");
+
+            loading.classList.add("active");
+            resultDiv.innerHTML = "";
 
             try {
                 const res = await fetch(`${apiBase}/report?from=${fromDate}&to=${toDate}`);
@@ -234,66 +516,56 @@
 
                 if (res.ok) {
                     const totalTransactions = data.daily.reduce((acc, d) => acc + d.count, 0);
-                    const totalRevenue = data.total.toLocaleString("vi-VN");
 
                     let dailyRows = "";
                     data.daily.forEach(d => {
                         dailyRows += `
-                            <tr>
-                                <td>${new Date(d.date).toLocaleDateString("vi-VN")}</td>
-                                <td>${d.totalAmount.toLocaleString("vi-VN")} ₫</td>
-                                <td>${d.count}</td>
-                            </tr>`;
+                                <tr>
+                                    <td><strong>${new Date(d.date).toLocaleDateString("vi-VN")}</strong></td>
+                                    <td><strong>${formatCurrency(d.totalAmount)}</strong></td>
+                                    <td><span class="badge badge-transfer">${d.count} giao dịch</span></td>
+                                </tr>`;
                     });
 
-                    document.getElementById("reportResult").innerHTML = `
-                        <h3>Kết quả từ ${new Date(data.from).toLocaleDateString("vi-VN")} đến ${new Date(data.to).toLocaleDateString("vi-VN")}</h3>
-                        <p><strong>Tổng doanh thu:</strong> ${totalRevenue} ₫</p>
-                        <p><strong>Số giao dịch:</strong> ${totalTransactions}</p>
-                        <table border="1" style="border-collapse:collapse;width:100%;margin-top:10px;">
-                            <thead>
-                                <tr>
-                                    <th>Ngày</th>
-                                    <th>Doanh thu</th>
-                                    <th>Số giao dịch</th>
-                                </tr>
-                            </thead>
-                            <tbody>${dailyRows}</tbody>
-                        </table>
-                    `;
+                    resultDiv.innerHTML = `
+                            <div class="stats">
+                                <div class="stat-card">
+                                    <div class="stat-label">💰 Tổng doanh thu</div>
+                                    <div class="stat-value">${formatCurrency(data.total)}</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">📊 Số giao dịch</div>
+                                    <div class="stat-value">${totalTransactions}</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">📅 Khoảng thời gian</div>
+                                    <div class="stat-value">${data.daily.length} ngày</div>
+                                </div>
+                            </div>
+                            <div class="daily-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Ngày</th>
+                                            <th>Doanh thu</th>
+                                            <th>Số giao dịch</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${dailyRows}</tbody>
+                                </table>
+                            </div>
+                        `;
                 } else {
                     alert("❌ " + (data.message || "Lỗi lấy báo cáo."));
                 }
             } catch (err) {
                 console.error("Lỗi lấy báo cáo:", err);
-                alert("Lỗi kết nối tới API.");
+                alert("❌ Lỗi kết nối tới API.");
+            } finally {
+                loading.classList.remove("active");
             }
         });
-            document.getElementById("amount").addEventListener("input", function (e) {
-                let value = e.target.value;
 
-                // 🔹 Loại bỏ mọi ký tự không phải số
-                value = value.replace(/[^\d]/g, "");
-
-                // 🔹 Format lại có dấu phẩy
-                if (value) {
-                    value = parseInt(value, 10).toLocaleString("vi-VN");
-                }
-
-                e.target.value = value;
-            });
-        function parseAmount() {
-            const amountFormatted = document.getElementById("amount").value;
-            const amount = parseFloat(amountFormatted.replace(/\./g, ""));  // Sửa regex: escape \. để xóa dấu chấm
-
-            if (isNaN(amount)) {
-                console.error("Giá trị không hợp lệ!");
-                return 0;  // Hoặc xử lý lỗi tùy bạn
-            }
-
-            console.log("Số sạch:", amount);  // Ví dụ: "1.234.567" → 1234567
-            return amount;
-        }
         window.onload = async function () {
             document.getElementById("transactionRef").value = await randomTransactionRef();
         };
