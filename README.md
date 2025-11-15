@@ -55,6 +55,6 @@ Mục tiêu: xây dựng API backend với đầy đủ nghiệp vụ cơ bản,
 
 ## 📂 Cấu trúc dự án
 <p align="center">
-  <img src="./Images/bookingList.jpg" width="400">
+  <img src="../Images/bookingList.jpg" width="400">
 </p>
 
