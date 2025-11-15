@@ -54,5 +54,7 @@ Mục tiêu: xây dựng API backend với đầy đủ nghiệp vụ cơ bản,
 - **Stored Procedures**: CreateBooking, AddBookingItem, CheckResourceAvailability
 
 ## 📂 Cấu trúc dự án
-![Booking List](./Images/bookingList.jpg)
+<p align="center">
+  <img src="./Images/bookingList.jpg" width="400">
+</p>
 

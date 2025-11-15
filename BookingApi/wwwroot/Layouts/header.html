@@ -1,5 +1,4 @@
-﻿
-<link href="../Layouts/css/style.css" rel="stylesheet" />
+﻿<link href="/Layouts/css/style.css" rel="stylesheet" />
 <aside class="sidebar" id="sidebar">
     <div class="logo-sidebar">
         <h1><i class="fas fa-hotel"></i> BookingPro</h1>
@@ -31,25 +30,25 @@
         </li>
         <li class="nav-item">
             <a href="/Payments/Payments.html" class="nav-link" data-page="payment">
-                <i class="fas fa-chart-line"></i>
+                <i class="fas fa-credit-card"></i>
                 <span>Thanh toán</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="/overrides/overrides.html" class="nav-link" data-page="overrides">
-                <i class="fas fa-cog"></i>
+                <i class="fas fa-lock"></i>
                 <span>Khóa phòng</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="/User/users.html" class="nav-link" data-page="users">
-                <i class="fas fa-cog"></i>
-                <span>Quản lý User </span>
+                <i class="fas fa-users"></i>
+                <span>Quản lý User</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="#" class="nav-link" data-page="settings">
-                <i class="fas fa-cog"></i>
+                <i class="fas fa-sliders-h"></i>
                 <span>Cài đặt</span>
             </a>
         </li>
@@ -77,7 +76,7 @@
             setTimeout(() => {
                 highlightActiveMenu();
             }, 100); // ⭐ chờ DOM cập nhật sau khi load sidebar
-           
+
         } catch (error) {
             console.error("Error loading layouts:", error);
         }
