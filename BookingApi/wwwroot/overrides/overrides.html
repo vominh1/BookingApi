@@ -327,60 +327,41 @@
     <script>
         async function loadLayout() {
             try {
-                // Load header
-                const headerResponse = await fetch("../layouts/header.html");
-                const headerHTML = await headerResponse.text();
+                const headerHTML = await (await fetch("../layouts/header.html")).text();
                 document.getElementById("header").innerHTML = headerHTML;
-
-                // Load sidebar
-                const sidebarResponse = await fetch("../layouts/sidebar.html");
-                const sidebarHTML = await sidebarResponse.text();
+                const sidebarHTML = await (await fetch("../layouts/sidebar.html")).text();
                 document.getElementById("sidebar").innerHTML = sidebarHTML;
-
-                // Load footer
-                const footerResponse = await fetch("../layouts/footer.html");
-                const footerHTML = await footerResponse.text();
+                highlightActiveMenu();
+                const footerHTML = await (await fetch("../layouts/footer.html")).text();
                 document.getElementById("footer").innerHTML = footerHTML;
 
-                // Highlight active menu
-                highlightActiveMenu();
             } catch (error) {
                 console.error("Error loading layouts:", error);
             }
         }
 
+
         function highlightActiveMenu() {
-            setTimeout(() => {
-                const links = document.querySelectorAll(".nav-link");
-                const savedPage = localStorage.getItem("activePage");
-
-                // Reset tất cả
-                links.forEach(l => l.classList.remove("active"));
-
-                // Nếu có mục đã lưu → highlight
-                if (savedPage) {
-                    links.forEach(l => {
-                        if (l.dataset.page === savedPage) {
-                            l.classList.add("active");
-                        }
-                    });
-                }
-
-                // Khi click → lưu lại
-                links.forEach(link => {
-                    link.addEventListener("click", function () {
-                        localStorage.setItem("activePage", this.dataset.page);
-                    });
+            const links = document.querySelectorAll(".nav-link");
+            const savedPage = localStorage.getItem("activePage");
+            links.forEach(l => l.classList.remove("active"));
+            if (savedPage) {
+                links.forEach(l => {
+                    if (l.dataset.page === savedPage) {
+                        l.classList.add("active");
+                    }
                 });
-
-            }, 50); // ⭐ chờ DOM cập nhật sau khi load sidebar
+            }
+            links.forEach(link => {
+                link.addEventListener("click", function () {
+                    localStorage.setItem("activePage", this.dataset.page);
+                });
+            });
         }
 
 
-        // Load layout khi trang ready
         document.addEventListener('DOMContentLoaded', () => {
             loadLayout();
-            loadBookings();
         });
     </script>
 
@@ -441,19 +422,19 @@
                     const statusText = o.isAvailable ? '🟢 Mở' : '🔴 Khóa';
 
                     const row = `
-                                            <tr>
-                                                <td>${o.overrideId}</td>
-                                                <td><strong>${o.name || "Không rõ"}</strong></td>
-                                                <td>${new Date(o.startAt).toLocaleString('vi-VN')}</td>
-                                                <td>${new Date(o.endAt).toLocaleString('vi-VN')}</td>
-                                                <td>${o.note || '<em style="color: #999;">Không có ghi chú</em>'}</td>
-                                                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                                                <td>
-                                                    <button class="delete-btn" onclick="deleteOverride(${o.overrideId}, ${o.resourceId})">
-                                                        Bỏ khóa
-                                                    </button>
-                                                </td>
-                                            </tr>`;
+                                                    <tr>
+                                                        <td>${o.overrideId}</td>
+                                                        <td><strong>${o.name || "Không rõ"}</strong></td>
+                                                        <td>${new Date(o.startAt).toLocaleString('vi-VN')}</td>
+                                                        <td>${new Date(o.endAt).toLocaleString('vi-VN')}</td>
+                                                        <td>${o.note || '<em style="color: #999;">Không có ghi chú</em>'}</td>
+                                                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                                                        <td>
+                                                            <button class="delete-btn" onclick="deleteOverride(${o.overrideId}, ${o.resourceId})">
+                                                                Bỏ khóa
+                                                            </button>
+                                                        </td>
+                                                    </tr>`;
                     tbody.innerHTML += row;
                 });
             } catch (err) {

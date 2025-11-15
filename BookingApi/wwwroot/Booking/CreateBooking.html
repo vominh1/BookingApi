@@ -358,46 +358,51 @@
     <script>
         async function loadLayout() {
             try {
-                const headerResponse = await fetch("../layouts/header.html");
-                const headerHTML = await headerResponse.text();
+                // Load header
+                const headerHTML = await (await fetch("../layouts/header.html")).text();
                 document.getElementById("header").innerHTML = headerHTML;
 
-                const sidebarResponse = await fetch("../layouts/sidebar.html");
-                const sidebarHTML = await sidebarResponse.text();
+                // Load sidebar
+                const sidebarHTML = await (await fetch("../layouts/sidebar.html")).text();
                 document.getElementById("sidebar").innerHTML = sidebarHTML;
 
-                const footerResponse = await fetch("../layouts/footer.html");
-                const footerHTML = await footerResponse.text();
+                // 👉 Gọi highlight ngay sau khi sidebar được chèn xong
+                highlightActiveMenu();
+
+                // Load footer
+                const footerHTML = await (await fetch("../layouts/footer.html")).text();
                 document.getElementById("footer").innerHTML = footerHTML;
 
-                highlightActiveMenu();
             } catch (error) {
                 console.error("Error loading layouts:", error);
             }
         }
 
+
         function highlightActiveMenu() {
-            setTimeout(() => {
-                const links = document.querySelectorAll(".nav-link");
-                const savedPage = localStorage.getItem("activePage");
+            const links = document.querySelectorAll(".nav-link");
+            const savedPage = localStorage.getItem("activePage");
 
-                links.forEach(l => l.classList.remove("active"));
+            // Gỡ active cũ
+            links.forEach(l => l.classList.remove("active"));
 
-                if (savedPage) {
-                    links.forEach(l => {
-                        if (l.dataset.page === savedPage) {
-                            l.classList.add("active");
-                        }
-                    });
-                }
-
-                links.forEach(link => {
-                    link.addEventListener("click", function () {
-                        localStorage.setItem("activePage", this.dataset.page);
-                    });
+            // Đánh dấu lại
+            if (savedPage) {
+                links.forEach(l => {
+                    if (l.dataset.page === savedPage) {
+                        l.classList.add("active");
+                    }
                 });
-            }, 50);
+            }
+
+            // Ghi nhớ khi click
+            links.forEach(link => {
+                link.addEventListener("click", function () {
+                    localStorage.setItem("activePage", this.dataset.page);
+                });
+            });
         }
+
 
         document.addEventListener('DOMContentLoaded', () => {
             loadLayout();
@@ -439,20 +444,20 @@
                     const data = await response.json();
                     resultDiv.className = "success";
                     resultDiv.innerHTML = `
-                            <div class="result-title">✅ Tạo Booking Thành Công!</div>
-                            <div class="result-item">
-                                <span class="result-label">Mã Booking:</span>
-                                <strong>${data.bookingCode}</strong>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">Booking ID:</span>
-                                <strong>${data.bookingId}</strong>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">Ghi chú:</span>
-                                ${data.note || '<em style="color: #999;">Không có ghi chú</em>'}
-                            </div>
-                        `;
+                                    <div class="result-title">✅ Tạo Booking Thành Công!</div>
+                                    <div class="result-item">
+                                        <span class="result-label">Mã Booking:</span>
+                                        <strong>${data.bookingCode}</strong>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Booking ID:</span>
+                                        <strong>${data.bookingId}</strong>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Ghi chú:</span>
+                                        ${data.note || '<em style="color: #999;">Không có ghi chú</em>'}
+                                    </div>
+                                `;
 
                     // Clear form after success
                     document.getElementById("createForm").reset();
@@ -460,17 +465,17 @@
                     const error = await response.text();
                     resultDiv.className = "error";
                     resultDiv.innerHTML = `
-                            <div class="result-title">❌ Có Lỗi Xảy Ra</div>
-                            <div class="result-item">${error}</div>
-                        `;
+                                    <div class="result-title">❌ Có Lỗi Xảy Ra</div>
+                                    <div class="result-item">${error}</div>
+                                `;
                 }
             } catch (err) {
                 resultDiv.style.display = "block";
                 resultDiv.className = "error";
                 resultDiv.innerHTML = `
-                        <div class="result-title">❌ Lỗi Kết Nối</div>
-                        <div class="result-item">Không thể kết nối tới API: ${err.message}</div>
-                    `;
+                                <div class="result-title">❌ Lỗi Kết Nối</div>
+                                <div class="result-item">Không thể kết nối tới API: ${err.message}</div>
+                            `;
             } finally {
                 // Remove loading state
                 btn.classList.remove("loading");
@@ -484,6 +489,12 @@
                 e.preventDefault();
                 createBooking();
             }
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            settimeout(() => {
+                highlightActiveMenu();
+            }, 100); // ⭐ chờ DOM cập nhật sau khi load sidebar
+            loadLayout();
         });
     </script>
 </body>

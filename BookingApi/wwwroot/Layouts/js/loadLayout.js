@@ -1,4 +1,5 @@
-﻿    async function loadLayout() {
+﻿
+    async function loadLayout() {
             try {
                 // Load header
                 const headerResponse = await fetch("/layouts/header.html");

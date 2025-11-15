@@ -348,60 +348,41 @@
     <script>
         async function loadLayout() {
             try {
-                // Load header
-                const headerResponse = await fetch("../layouts/header.html");
-                const headerHTML = await headerResponse.text();
+                const headerHTML = await (await fetch("../layouts/header.html")).text();
                 document.getElementById("header").innerHTML = headerHTML;
-
-                // Load sidebar
-                const sidebarResponse = await fetch("../layouts/sidebar.html");
-                const sidebarHTML = await sidebarResponse.text();
+                const sidebarHTML = await (await fetch("../layouts/sidebar.html")).text();
                 document.getElementById("sidebar").innerHTML = sidebarHTML;
-
-                // Load footer
-                const footerResponse = await fetch("../layouts/footer.html");
-                const footerHTML = await footerResponse.text();
+                highlightActiveMenu();
+                const footerHTML = await (await fetch("../layouts/footer.html")).text();
                 document.getElementById("footer").innerHTML = footerHTML;
 
-                // Highlight active menu
-                highlightActiveMenu();
             } catch (error) {
                 console.error("Error loading layouts:", error);
             }
         }
 
+
         function highlightActiveMenu() {
-            setTimeout(() => {
-                const links = document.querySelectorAll(".nav-link");
-                const savedPage = localStorage.getItem("activePage");
-
-                // Reset tất cả
-                links.forEach(l => l.classList.remove("active"));
-
-                // Nếu có mục đã lưu → highlight
-                if (savedPage) {
-                    links.forEach(l => {
-                        if (l.dataset.page === savedPage) {
-                            l.classList.add("active");
-                        }
-                    });
-                }
-
-                // Khi click → lưu lại
-                links.forEach(link => {
-                    link.addEventListener("click", function () {
-                        localStorage.setItem("activePage", this.dataset.page);
-                    });
+            const links = document.querySelectorAll(".nav-link");
+            const savedPage = localStorage.getItem("activePage");
+            links.forEach(l => l.classList.remove("active"));
+            if (savedPage) {
+                links.forEach(l => {
+                    if (l.dataset.page === savedPage) {
+                        l.classList.add("active");
+                    }
                 });
-
-            }, 50); // ⭐ chờ DOM cập nhật sau khi load sidebar
+            }
+            links.forEach(link => {
+                link.addEventListener("click", function () {
+                    localStorage.setItem("activePage", this.dataset.page);
+                });
+            });
         }
 
 
-        // Load layout khi trang ready
         document.addEventListener('DOMContentLoaded', () => {
             loadLayout();
-            loadBookings();
         });
     </script>
 
@@ -422,25 +403,25 @@
                 const items = await res.json();
                 const container = document.getElementById('booking-items');
                 container.innerHTML = `
-                                    <table border="1" cellpadding="5">
-                                        <tr>
-                                            <th>🏠 Phòng</th>
-                                            <th>📅 Bắt đầu</th>
-                                            <th>📅 Kết thúc</th>
-                                            <th>💰 Giá</th>
-                                            <th>📝 Ghi chú</th>
-                                        </tr>
-                                        ${items.map(i => `
+                                        <table border="1" cellpadding="5">
                                             <tr>
-                                                <td>${i.resourceName}</td>
-                                                <td>${new Date(i.startAt).toLocaleString()}</td>
-                                                <td>${new Date(i.endAt).toLocaleString()}</td>
-                                                <td id="price">${i.price}</td>
-                                                <td>${i.note || ''}</td>
+                                                <th>🏠 Phòng</th>
+                                                <th>📅 Bắt đầu</th>
+                                                <th>📅 Kết thúc</th>
+                                                <th>💰 Giá</th>
+                                                <th>📝 Ghi chú</th>
                                             </tr>
-                                        `).join('')}
-                                    </table>
-                                `;
+                                            ${items.map(i => `
+                                                <tr>
+                                                    <td>${i.resourceName}</td>
+                                                    <td>${new Date(i.startAt).toLocaleString()}</td>
+                                                    <td>${new Date(i.endAt).toLocaleString()}</td>
+                                                    <td id="price">${i.price}</td>
+                                                    <td>${i.note || ''}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </table>
+                                    `;
             } catch (error) {
                 console.error(error);
                 alert("💥 Lỗi khi tải danh sách phòng!");
@@ -457,16 +438,16 @@
             const rooms = await res.json();
             const container = document.getElementById('room-list');
             container.innerHTML = rooms.map(r => `
-                                        <div class="room-card">
-                                            <h3>🏠 ${r.name}</h3>
-                                            <p id="price">💰 Giá: ${r.price} ₫</p>
-                                            <p>${r.description || 'Không có mô tả'}</p>
-                                            <p>📍 Vị trí: ${r.location || 'Chưa rõ'}</p>
-                                            <button onclick="openBookingForm(${r.resourceId}, '${r.name}', ${r.price})">
-                                                📅 Đặt phòng
-                                            </button>
-                                        </div>
-                                    `).join('');
+                                            <div class="room-card">
+                                                <h3>🏠 ${r.name}</h3>
+                                                <p id="price">💰 Giá: ${r.price} ₫</p>
+                                                <p>${r.description || 'Không có mô tả'}</p>
+                                                <p>📍 Vị trí: ${r.location || 'Chưa rõ'}</p>
+                                                <button onclick="openBookingForm(${r.resourceId}, '${r.name}', ${r.price})">
+                                                    📅 Đặt phòng
+                                                </button>
+                                            </div>
+                                        `).join('');
         }
 
         function openBookingForm(id, name, price) {
@@ -499,11 +480,11 @@
                     result.style.color = '#155724';
                     result.style.border = '2px solid #c3e6cb';
                     result.innerHTML = `<p style="color:green">
-                                                ✅ Phòng trống.<br>
-                                                <button onclick="confirmBooking(${id}, \`${start}\`, \`${end}\`, ${price})" style="margin-top:15px;">
-                                                    ✔️ Xác nhận đặt
-                                                </button>
-                                            </p>`;
+                                                    ✅ Phòng trống.<br>
+                                                    <button onclick="confirmBooking(${id}, \`${start}\`, \`${end}\`, ${price})" style="margin-top:15px;">
+                                                        ✔️ Xác nhận đặt
+                                                    </button>
+                                                </p>`;
                 } else {
                     result.style.background = '#f8d7da';
                     result.style.color = '#721c24';

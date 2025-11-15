@@ -224,82 +224,133 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>👥 Hệ thống Quản lý Users & Roles</h1>
-            <p>Quản lý người dùng và phân quyền một cách chuyên nghiệp</p>
-        </div>
+    <div class="page-container">
+        <div id="sidebar"></div>  <!-- Menu bên trái -->
+        <div class="main-content">
+            <div id="header"></div>  <!-- Header trên -->
+            <div class="content-wrapper">
 
-        <div class="grid">
-            <div>
-                <div class="card">
-                    <h2><span class="icon">➕</span> Thêm người dùng mới</h2>
-                    <form id="userForm">
-                        <div class="form-group">
-                            <label>Tên đăng nhập</label>
-                            <input type="text" id="username" required placeholder="Nhập tên đăng nhập">
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="email" placeholder="example@email.com">
-                        </div>
-                        <div class="form-group">
-                            <label>Mật khẩu</label>
-                            <input type="password" id="password" required placeholder="Nhập mật khẩu">
-                        </div>
-                        <div class="form-group">
-                            <label>Họ và tên</label>
-                            <input type="text" id="fullName" placeholder="Nhập họ tên đầy đủ">
-                        </div>
-                        <div class="form-group">
-                            <label>Số điện thoại</label>
-                            <input type="text" id="phone" placeholder="0123456789">
-                        </div>
-                        <div class="form-group">
-                            <label>Chọn vai trò (có thể chọn nhiều)</label>
-                            <select id="roles" multiple required></select>
-                        </div>
-                        <button type="submit">Tạo người dùng mới</button>
-                    </form>
-                </div>
+                <div class="container">
+                    <div class="header">
+                        <h1>👥 Hệ thống Quản lý Users & Roles</h1>
+                        <p>Quản lý người dùng và phân quyền một cách chuyên nghiệp</p>
+                    </div>
 
-                <div class="card" style="margin-top: 30px;">
-                    <h2><span class="icon">🔐</span> Đăng nhập</h2>
-                    <form id="loginForm">
-                        <div class="form-group">
-                            <label>Tài khoản hoặc Email</label>
-                            <input type="text" id="loginUser" required placeholder="Username hoặc Email">
+                    <div class="grid">
+                        <div>
+                            <div class="card">
+                                <h2><span class="icon">➕</span> Thêm người dùng mới</h2>
+                                <form id="userForm">
+                                    <div class="form-group">
+                                        <label>Tên đăng nhập</label>
+                                        <input type="text" id="username" required placeholder="Nhập tên đăng nhập">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" id="email" placeholder="example@email.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Mật khẩu</label>
+                                        <input type="password" id="password" required placeholder="Nhập mật khẩu">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Họ và tên</label>
+                                        <input type="text" id="fullName" placeholder="Nhập họ tên đầy đủ">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Số điện thoại</label>
+                                        <input type="text" id="phone" placeholder="0123456789">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Chọn vai trò (có thể chọn nhiều)</label>
+                                        <select id="roles" multiple required></select>
+                                    </div>
+                                    <button type="submit">Tạo người dùng mới</button>
+                                </form>
+                            </div>
+
+                            <div class="card" style="margin-top: 30px;">
+                                <h2><span class="icon">🔐</span> Đăng nhập</h2>
+                                <form id="loginForm">
+                                    <div class="form-group">
+                                        <label>Tài khoản hoặc Email</label>
+                                        <input type="text" id="loginUser" required placeholder="Username hoặc Email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Mật khẩu</label>
+                                        <input type="password" id="loginPass" required placeholder="Nhập mật khẩu">
+                                    </div>
+                                    <button type="submit">Đăng nhập hệ thống</button>
+                                </form>
+                                <div id="tokenDisplay" class="token-display" style="display: none;"></div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Mật khẩu</label>
-                            <input type="password" id="loginPass" required placeholder="Nhập mật khẩu">
+
+                        <div class="card">
+                            <h2><span class="icon">📋</span> Danh sách người dùng</h2>
+                            <div class="table-container">
+                                <table id="usersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên đăng nhập</th>
+                                            <th>Email</th>
+                                            <th>Họ tên</th>
+                                            <th>Vai trò</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
                         </div>
-                        <button type="submit">Đăng nhập hệ thống</button>
-                    </form>
-                    <div id="tokenDisplay" class="token-display" style="display: none;"></div>
+                    </div>
                 </div>
             </div>
-
-            <div class="card">
-                <h2><span class="icon">📋</span> Danh sách người dùng</h2>
-                <div class="table-container">
-                    <table id="usersTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Tên đăng nhập</th>
-                                <th>Email</th>
-                                <th>Họ tên</th>
-                                <th>Vai trò</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
+            <div id="footer"></div>  <!-- Footer dưới -->
         </div>
     </div>
 
+
+    <script>
+        async function loadLayout() {
+            try {
+                const headerHTML = await (await fetch("../layouts/header.html")).text();
+                document.getElementById("header").innerHTML = headerHTML;
+                const sidebarHTML = await (await fetch("../layouts/sidebar.html")).text();
+                document.getElementById("sidebar").innerHTML = sidebarHTML;
+                highlightActiveMenu();
+                const footerHTML = await (await fetch("../layouts/footer.html")).text();
+                document.getElementById("footer").innerHTML = footerHTML;
+
+            } catch (error) {
+                console.error("Error loading layouts:", error);
+            }
+        }
+
+
+        function highlightActiveMenu() {
+            const links = document.querySelectorAll(".nav-link");
+            const savedPage = localStorage.getItem("activePage");
+            links.forEach(l => l.classList.remove("active"));
+            if (savedPage) {
+                links.forEach(l => {
+                    if (l.dataset.page === savedPage) {
+                        l.classList.add("active");
+                    }
+                });
+            }
+            links.forEach(link => {
+                link.addEventListener("click", function () {
+                    localStorage.setItem("activePage", this.dataset.page);
+                });
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLayout();
+        });
+    </script>
     <script>
         const apiBase = "https://localhost:44336/api";
         let jwtToken = "";
@@ -340,13 +391,13 @@
                 data.forEach(u => {
                     const rolesHtml = u.roles.map(r => `<span class="badge">${r}</span>`).join(' ');
                     const row = `
-                            <tr>
-                                <td><strong>${u.userId}</strong></td>
-                                <td>${u.username}</td>
-                                <td>${u.email || '<em>Chưa có</em>'}</td>
-                                <td>${u.fullName || '<em>Chưa có</em>'}</td>
-                                <td>${rolesHtml}</td>
-                            </tr>`;
+                                    <tr>
+                                        <td><strong>${u.userId}</strong></td>
+                                        <td>${u.username}</td>
+                                        <td>${u.email || '<em>Chưa có</em>'}</td>
+                                        <td>${u.fullName || '<em>Chưa có</em>'}</td>
+                                        <td>${rolesHtml}</td>
+                                    </tr>`;
                     tbody.innerHTML += row;
                 });
             } catch (err) {
