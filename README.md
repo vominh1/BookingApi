@@ -40,8 +40,8 @@
   box-shadow: 0 0 10px rgba(0,0,0,0.05);">
 
   <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-      <img src="./Images/trangchu.jpg" width="380" style="border-radius:10px;" />
-      <img src="./Images/datbooking.jpg" width="380" style="border-radius:10px;" />
+      <img src="./BookingApi/Images/trangchu.jpg" width="380" style="border-radius:10px;" />
+      <img src="./BookingApi/Images/datbooking.jpg" width="380" style="border-radius:10px;" />
   </div>
 
   <p style="font-size: 14px; color: #666;">Giao diện Booking</p>
@@ -58,7 +58,7 @@
 <div align="center" style="
   border: 1px solid #ddd; border-radius: 12px; padding: 20px;
   width: 70%; background: #fafafa; margin-bottom: 25px;">
-  <img src="./Images/datbooking.jpg" width="420" style="border-radius:10px;" />
+  <img src="./BookingApi/Images/datbooking.jpg" width="420" style="border-radius:10px;" />
   <p style="font-size: 14px; color: #666;">Minh họa chọn phòng & thời gian</p>
 </div>
 
@@ -73,7 +73,7 @@
 <div align="center" style="
   border: 1px solid #ddd; border-radius: 12px; padding: 20px;
   width: 70%; background: #fafafa; margin-bottom: 25px;">
-  <img src="./Images/themdichvu.jpg" width="420" style="border-radius:10px;" />
+  <img src="./BookingApi/Images/themdichvu.jpg" width="420" style="border-radius:10px;" />
   <p style="font-size: 14px; color: #666;">Danh sách dịch vụ</p>
 </div>
 
@@ -90,9 +90,9 @@
   width: 80%; background: #fafafa; margin-bottom: 25px;">
   
   <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px;">
-      <img src="./Images/danhSachBooking.jpg" width="320" style="border-radius:10px;" />
-      <img src="./Images/chitietbooking1.jpg" width="320" style="border-radius:10px;" />
-      <img src="./Images/chitietbooking2.jpg" width="320" style="border-radius:10px;" />
+      <img src="./BookingApi/Images/danhSachBooking.jpg" width="320" style="border-radius:10px;" />
+      <img src="./BookingApi/Images/chitietbooking1.jpg" width="320" style="border-radius:10px;" />
+      <img src="./BookingApi/Images/chitietbooking2.jpg" width="320" style="border-radius:10px;" />
   </div>
 
   <p style="font-size: 14px; color: #666;">Danh sách phòng & địa điểm</p>
@@ -109,7 +109,7 @@
 <div align="center" style="
   border: 1px solid #ddd; border-radius: 12px; padding: 20px;
   width: 70%; background: #fafafa; margin-bottom: 25px;">
-  <img src="./Images/khoaPhong.jpg" width="420" style="border-radius:10px;" />
+  <img src="./BookingApi/Images/khoaPhong.jpg" width="420" style="border-radius:10px;" />
   <p style="font-size: 14px; color: #666;">Khóa phòng (Override)</p>
 </div>
 
@@ -124,7 +124,7 @@
 <div align="center" style="
   border: 1px solid #ddd; border-radius: 12px; padding: 20px;
   width: 70%; background: #fafafa; margin-bottom: 25px;">
-  <img src="./Images/thanhtoan.jpg" width="420" style="border-radius:10px;" />
+  <img src="./BookingApi/Images/thanhtoan.jpg" width="420" style="border-radius:10px;" />
   <p style="font-size: 14px; color: #666;">Báo cáo thanh toán</p>
 </div>
 
@@ -139,7 +139,7 @@
 <div align="center" style="
   border: 1px solid #ddd; border-radius: 12px; padding: 20px;
   width: 70%; background: #fafafa; margin-bottom: 25px;">
-  <img src="./Images/user.jpg" width="420" style="border-radius:10px;" />
+  <img src="./BookingApi/Images/user.jpg" width="420" style="border-radius:10px;" />
   <p style="font-size: 14px; color: #666;">Quản lý người dùng</p>
 </div>
 
@@ -155,7 +155,7 @@
 <div align="center" style="
   border: 1px solid #ddd; border-radius: 12px; padding: 20px;
   width: 70%; background: #fafafa;">
-  <img src="./Images/report_chart.jpg" width="420" style="border-radius:10px;" />
+  <img src="./BookingApi/Images/report_chart.jpg" width="420" style="border-radius:10px;" />
   <p style="font-size: 14px; color: #666;">Biểu đồ báo cáo</p>
 </div>
 
