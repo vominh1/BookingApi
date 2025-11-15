@@ -276,28 +276,81 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎯 Chọn dịch vụ thêm cho Booking</h1>
-            <div class="search-box">
-                <label>📋 Mã Booking:</label>
-                <input type="text" id="bookingCode" placeholder="VD: BK202511090001" />
-                <button class="btn-primary" onclick="checkBooking()">🔍 Xem dịch vụ</button>
+
+
+    <div class="page-container">
+        <div id="sidebar"></div>  <!-- Menu bên trái -->
+        <div class="main-content">
+            <div id="header"></div>  <!-- Header trên -->
+            <div class="content-wrapper">
+                <div class="container">
+                    <div class="header">
+                        <h1>🎯 Chọn dịch vụ thêm cho Booking</h1>
+                        <div class="search-box">
+                            <label>📋 Mã Booking:</label>
+                            <input type="text" id="bookingCode" placeholder="VD: BK202511090001" />
+                            <button class="btn-primary" onclick="checkBooking()">🔍 Xem dịch vụ</button>
+                        </div>
+                    </div>
+
+                    <div id="service-list">
+                        <div class="loading-state">💡 Nhập mã Booking để xem danh sách dịch vụ</div>
+                    </div>
+                </div>
+
+                <div id="modal" class="modal">
+                    <div class="modal-content">
+                        <h2 id="modal-title">Thông báo</h2>
+                        <p id="modal-message"></p>
+                        <button class="btn-close" onclick="closeModal()">Đóng</button>
+                    </div>
+                </div>
+
             </div>
-        </div>
-
-        <div id="service-list">
-            <div class="loading-state">💡 Nhập mã Booking để xem danh sách dịch vụ</div>
+            <div id="footer"></div>  <!-- Footer dưới -->
         </div>
     </div>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <h2 id="modal-title">Thông báo</h2>
-            <p id="modal-message"></p>
-            <button class="btn-close" onclick="closeModal()">Đóng</button>
-        </div>
-    </div>
+    <script>
+        async function loadLayout() {
+            try {
+                const headerHTML = await (await fetch("../layouts/header.html")).text();
+                document.getElementById("header").innerHTML = headerHTML;
+                const sidebarHTML = await (await fetch("../layouts/sidebar.html")).text();
+                document.getElementById("sidebar").innerHTML = sidebarHTML;
+                highlightActiveMenu();
+                const footerHTML = await (await fetch("../layouts/footer.html")).text();
+                document.getElementById("footer").innerHTML = footerHTML;
+
+            } catch (error) {
+                console.error("Error loading layouts:", error);
+            }
+        }
+
+
+        function highlightActiveMenu() {
+            const links = document.querySelectorAll(".nav-link");
+            const savedPage = localStorage.getItem("activePage");
+            links.forEach(l => l.classList.remove("active"));
+            if (savedPage) {
+                links.forEach(l => {
+                    if (l.dataset.page === savedPage) {
+                        l.classList.add("active");
+                    }
+                });
+            }
+            links.forEach(link => {
+                link.addEventListener("click", function () {
+                    localStorage.setItem("activePage", this.dataset.page);
+                });
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLayout();
+        });
+    </script>
 
     <script>
         const baseUrl = "https://localhost:44336/api";
@@ -333,16 +386,16 @@
                 const data = await res.json();
 
                 const html = data.map(s => `
-                        <div class="service-card">
-                            <h3>${s.name}</h3>
-                            <p>${s.description || 'Dịch vụ chất lượng cao'}</p>
-                            <div class="price">💰 ${s.price.toLocaleString()} VND</div>
-                            <div class="quantity-control">
-                                <input type="number" id="qty-${s.serviceId}" placeholder="Số lượng" min="1" value="1" />
-                            </div>
-                            <button class="btn-add" onclick="addService('${code}', ${s.serviceId})">➕ Thêm dịch vụ</button>
-                        </div>
-                    `).join('');
+                                <div class="service-card">
+                                    <h3>${s.name}</h3>
+                                    <p>${s.description || 'Dịch vụ chất lượng cao'}</p>
+                                    <div class="price">💰 ${s.price.toLocaleString()} VND</div>
+                                    <div class="quantity-control">
+                                        <input type="number" id="qty-${s.serviceId}" placeholder="Số lượng" min="1" value="1" />
+                                    </div>
+                                    <button class="btn-add" onclick="addService('${code}', ${s.serviceId})">➕ Thêm dịch vụ</button>
+                                </div>
+                            `).join('');
 
                 document.getElementById('service-list').innerHTML = html;
             } catch (error) {
