@@ -3,94 +3,407 @@
 <head>
     <link rel="stylesheet" href="../layouts/css/style.css">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tạo Booking Mới</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #fafafa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .page-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            padding: 30px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         h1 {
-            color: #333;
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 700;
+            animation: slideDown 0.6s ease;
         }
 
-        form {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            width: 400px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin: 20px auto;
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            animation: scaleIn 0.6s ease;
+            transition: transform 0.3s ease;
+        }
+
+            .form-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 25px 70px rgba(0,0,0,0.15);
+            }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
         }
 
         label {
             display: block;
-            margin-top: 10px;
-            font-weight: bold;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
         }
 
         input, textarea {
             width: 100%;
-            padding: 8px;
-            margin-top: 6px;
-            box-sizing: border-box;
+            padding: 14px 18px;
+            border: 2px solid #e8ecf1;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            font-family: inherit;
         }
 
-        button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #007bff;
+            input:focus, textarea:focus {
+                outline: none;
+                border-color: #667eea;
+                background: white;
+                box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+                transform: translateY(-2px);
+            }
+
+                input:focus + label,
+                textarea:focus + label {
+                    color: #667eea;
+                }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #a0aec0;
+            font-size: 1.2rem;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        input:focus ~ .input-icon {
+            color: #667eea;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
-            border-radius: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            margin-top: 10px;
         }
 
-            button:hover {
-                background: #0056b3;
+            .btn-submit:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+            }
+
+            .btn-submit:active {
+                transform: translateY(-1px);
             }
 
         #result {
-            margin-top: 20px;
-            padding: 10px;
-            background: #e7f3ff;
-            border: 1px solid #b3d8ff;
-            border-radius: 6px;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 15px;
             display: none;
+            animation: slideUp 0.5s ease;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+            #result.success {
+                background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                border: 2px solid #28a745;
+                color: #155724;
+            }
+
+            #result.error {
+                background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+                border: 2px solid #dc3545;
+                color: #721c24;
+            }
+
+        .result-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+            .result-item:last-child {
+                border-bottom: none;
+            }
+
+        .result-label {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        /* Loading animation */
+        .btn-submit.loading {
+            pointer-events: none;
+            opacity: 0.7;
+            position: relative;
+        }
+
+            .btn-submit.loading::after {
+                content: "";
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                top: 50%;
+                left: 50%;
+                margin-left: -10px;
+                margin-top: -10px;
+                border: 3px solid #ffffff;
+                border-radius: 50%;
+                border-top-color: transparent;
+                animation: spinner 0.6s linear infinite;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spinner {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 20px;
+            }
+
+            .form-card {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            input, textarea {
+                padding: 12px 15px;
+            }
+
+            .btn-submit {
+                padding: 14px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Placeholder styling */
+        ::placeholder {
+            color: #a0aec0;
+            opacity: 1;
+        }
+
+        /* Input hint text */
+        .input-hint {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 6px;
+            display: block;
         }
     </style>
 </head>
 <body>
-    <!-- Layout -->
-    <div id="header" style="margin-bottom:60px"></div>
-    <div id="banner"></div>
+    <div class="page-container">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div id="header"></div>
+            <div class="content-wrapper">
+                <main>
+                    <h1>➕ Tạo Booking Mới</h1>
 
-    <!-- Nội dung chính -->
-    <main>
-        <h1>➕ Tạo Booking Mới</h1>
+                    <div class="form-card">
+                        <form id="createForm" onsubmit="return false;">
+                            <div class="form-group">
+                                <label for="customerId">ID Khách hàng</label>
+                                <input type="number"
+                                       id="customerId"
+                                       placeholder="Nhập ID khách hàng (VD: 1)"
+                                       min="1">
+                                <span class="input-icon">👤</span>
+                                <small class="input-hint">Để trống nếu chưa có thông tin khách hàng</small>
+                            </div>
 
-        <form id="createForm">
-            <label>ID Khách hàng:</label>
-            <input type="number" id="customerId" placeholder="VD: 1">
+                            <div class="form-group">
+                                <label for="userId">ID Nhân viên (User)</label>
+                                <input type="number"
+                                       id="userId"
+                                       placeholder="Nhập ID nhân viên (VD: 2)"
+                                       min="1">
+                                <span class="input-icon">👨‍💼</span>
+                                <small class="input-hint">Nhân viên phụ trách booking này</small>
+                            </div>
 
-            <label>ID Nhân viên (User):</label>
-            <input type="number" id="userId" placeholder="VD: 2">
+                            <div class="form-group">
+                                <label for="note">Ghi chú</label>
+                                <textarea id="note"
+                                          placeholder="Nhập ghi chú bổ sung cho booking này..."></textarea>
+                                <small class="input-hint">Thông tin bổ sung về booking (không bắt buộc)</small>
+                            </div>
 
-            <label>Ghi chú:</label>
-            <textarea id="note" placeholder="Ghi chú thêm..."></textarea>
+                            <button type="button" class="btn-submit" onclick="createBooking()">
+                                🎯 Tạo Booking Ngay
+                            </button>
+                        </form>
 
-            <button type="button" onclick="createBooking()">Tạo Booking</button>
-        </form>
+                        <div id="result"></div>
+                    </div>
+                </main>
+            </div>
+            <div id="footer"></div>
+        </div>
+    </div>
 
-        <div id="result"></div>
-    </main>
+    <!-- JavaScript load layout -->
+    <script>
+        async function loadLayout() {
+            try {
+                const headerResponse = await fetch("../layouts/header.html");
+                const headerHTML = await headerResponse.text();
+                document.getElementById("header").innerHTML = headerHTML;
 
-    <div id="footer"></div>
+                const sidebarResponse = await fetch("../layouts/sidebar.html");
+                const sidebarHTML = await sidebarResponse.text();
+                document.getElementById("sidebar").innerHTML = sidebarHTML;
 
-    <!-- JS -->
-    
+                const footerResponse = await fetch("../layouts/footer.html");
+                const footerHTML = await footerResponse.text();
+                document.getElementById("footer").innerHTML = footerHTML;
+
+                highlightActiveMenu();
+            } catch (error) {
+                console.error("Error loading layouts:", error);
+            }
+        }
+
+        function highlightActiveMenu() {
+            setTimeout(() => {
+                const links = document.querySelectorAll(".nav-link");
+                const savedPage = localStorage.getItem("activePage");
+
+                links.forEach(l => l.classList.remove("active"));
+
+                if (savedPage) {
+                    links.forEach(l => {
+                        if (l.dataset.page === savedPage) {
+                            l.classList.add("active");
+                        }
+                    });
+                }
+
+                links.forEach(link => {
+                    link.addEventListener("click", function () {
+                        localStorage.setItem("activePage", this.dataset.page);
+                    });
+                });
+            }, 50);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLayout();
+        });
+    </script>
+
     <script src="../Layouts/js/layout.js"></script>
     <script>
         const API_URL = "https://localhost:44336/api/booking/byform";
@@ -99,6 +412,13 @@
             const customerId = document.getElementById("customerId").value;
             const userId = document.getElementById("userId").value;
             const note = document.getElementById("note").value;
+            const btn = document.querySelector(".btn-submit");
+            const resultDiv = document.getElementById("result");
+
+            // Show loading state
+            btn.classList.add("loading");
+            btn.textContent = "Đang xử lý...";
+            resultDiv.style.display = "none";
 
             const booking = {
                 customerId: customerId ? parseInt(customerId) : null,
@@ -113,26 +433,58 @@
                     body: JSON.stringify(booking)
                 });
 
-                const resultDiv = document.getElementById("result");
                 resultDiv.style.display = "block";
 
                 if (response.ok) {
                     const data = await response.json();
+                    resultDiv.className = "success";
                     resultDiv.innerHTML = `
-                    <strong>✅ ${data.message}</strong><br>
-                    Mã Booking: ${data.bookingCode}<br>
-                    Booking ID: ${data.bookingId}<br>
-                    Ghi chú: ${data.note || '(Không có)'}
-                  `;
+                            <div class="result-title">✅ Tạo Booking Thành Công!</div>
+                            <div class="result-item">
+                                <span class="result-label">Mã Booking:</span>
+                                <strong>${data.bookingCode}</strong>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Booking ID:</span>
+                                <strong>${data.bookingId}</strong>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Ghi chú:</span>
+                                ${data.note || '<em style="color: #999;">Không có ghi chú</em>'}
+                            </div>
+                        `;
+
+                    // Clear form after success
+                    document.getElementById("createForm").reset();
                 } else {
                     const error = await response.text();
-                    resultDiv.innerHTML = `<strong style="color:red;">❌ Lỗi:</strong> ${error}`;
+                    resultDiv.className = "error";
+                    resultDiv.innerHTML = `
+                            <div class="result-title">❌ Có Lỗi Xảy Ra</div>
+                            <div class="result-item">${error}</div>
+                        `;
                 }
             } catch (err) {
-                alert("Lỗi kết nối tới API: " + err.message);
+                resultDiv.style.display = "block";
+                resultDiv.className = "error";
+                resultDiv.innerHTML = `
+                        <div class="result-title">❌ Lỗi Kết Nối</div>
+                        <div class="result-item">Không thể kết nối tới API: ${err.message}</div>
+                    `;
+            } finally {
+                // Remove loading state
+                btn.classList.remove("loading");
+                btn.textContent = "🎯 Tạo Booking Ngay";
             }
         }
-    </script>
 
+        // Submit on Enter key (except in textarea)
+        document.getElementById("createForm").addEventListener("keypress", function (e) {
+            if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+                e.preventDefault();
+                createBooking();
+            }
+        });
+    </script>
 </body>
 </html>

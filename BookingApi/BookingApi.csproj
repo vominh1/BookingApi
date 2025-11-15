@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\Layouts\js\layout.js" />
+    <Content Remove="wwwroot\Layouts\js\loadLayout.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <None Include="wwwroot\Layouts\css\style.css" />
-    <None Include="wwwroot\Layouts\js\layout.js" />
+    <None Include="wwwroot\Layouts\js\loadLayout.js" />
   </ItemGroup>
 
   <ItemGroup>

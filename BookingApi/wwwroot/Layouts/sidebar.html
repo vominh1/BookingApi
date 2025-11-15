@@ -4,3 +4,29 @@
         <li><a href="/pages/booking-create.html">➕ Tạo mới</a></li>
     </ul>
 </aside>
+<script>
+    function activateSidebarMemory() {
+        const links = document.querySelectorAll(".nav-link");
+        const savedPage = localStorage.getItem("activePage");
+
+        // Reset tất cả
+        links.forEach(link => link.classList.remove("active"));
+
+        // Gắn lại mục đã lưu
+        if (savedPage) {
+            links.forEach(link => {
+                if (link.dataset.page === savedPage) {
+                    link.classList.add("active");
+                }
+            });
+        }
+
+        // Khi click thì lưu
+        links.forEach(link => {
+            link.addEventListener("click", function () {
+                localStorage.setItem("activePage", this.dataset.page);
+            });
+        });
+    }
+
+</script>

@@ -1,10 +1,110 @@
 ﻿
-<header class="header">
-    <h1>🏨 Booking Management</h1>
-    <nav>
-        <a href="/Room/room.html">Trang chủ</a>
-        <a href="/Booking/index.html">Danh sách Booking</a>
-        <a href="/Booking/createBooking.html">Tạo Booking</a>
-        <a href="/Room/room.html">Đặt phòng</a> 
-    </nav>
-</header>
+<link href="../Layouts/css/style.css" rel="stylesheet" />
+<aside class="sidebar" id="sidebar">
+    <div class="logo-sidebar">
+        <h1><i class="fas fa-hotel"></i> BookingPro</h1>
+    </div>
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="/Room/room.html" class="nav-link" data-page="room">
+                <i class="fas fa-home"></i>
+                <span>Trang chủ</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/Booking/index.html" class="nav-link" data-page="booking-list">
+                <i class="fas fa-list"></i>
+                <span>Danh sách Booking</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/Booking/createBooking.html" class="nav-link" data-page="booking-create">
+                <i class="fas fa-plus-circle"></i>
+                <span>Tạo Booking mới</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/Room/room.html" class="nav-link" data-page="room-booking">
+                <i class="fas fa-bed"></i>
+                <span>Đặt phòng</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/Payments/Payments.html" class="nav-link" data-page="payment">
+                <i class="fas fa-chart-line"></i>
+                <span>Thanh toán</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/overrides/overrides.html" class="nav-link" data-page="overrides">
+                <i class="fas fa-cog"></i>
+                <span>Khóa phòng</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="#" class="nav-link" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Cài đặt</span>
+            </a>
+        </li>
+    </ul>
+</aside>
+<script>
+    async function loadLayout() {
+        try {
+            // Load header
+            const headerResponse = await fetch("../layouts/header.html");
+            const headerHTML = await headerResponse.text();
+            document.getElementById("header").innerHTML = headerHTML;
+
+            // Load sidebar
+            const sidebarResponse = await fetch("../layouts/sidebar.html");
+            const sidebarHTML = await sidebarResponse.text();
+            document.getElementById("sidebar").innerHTML = sidebarHTML;
+
+            // Load footer
+            const footerResponse = await fetch("../layouts/footer.html");
+            const footerHTML = await footerResponse.text();
+            document.getElementById("footer").innerHTML = footerHTML;
+
+            // Highlight active menu
+            highlightActiveMenu();
+        } catch (error) {
+            console.error("Error loading layouts:", error);
+        }
+    }
+
+    function highlightActiveMenu() {
+        setTimeout(() => {
+            const links = document.querySelectorAll(".nav-link");
+            const savedPage = localStorage.getItem("activePage");
+
+            // Reset tất cả
+            links.forEach(l => l.classList.remove("active"));
+
+            // Nếu có mục đã lưu → highlight
+            if (savedPage) {
+                links.forEach(l => {
+                    if (l.dataset.page === savedPage) {
+                        l.classList.add("active");
+                    }
+                });
+            }
+
+            // Khi click → lưu lại
+            links.forEach(link => {
+                link.addEventListener("click", function () {
+                    localStorage.setItem("activePage", this.dataset.page);
+                });
+            });
+
+        }, 50); // ⭐ chờ DOM cập nhật sau khi load sidebar
+    }
+
+
+    // Load layout khi trang ready
+    document.addEventListener('DOMContentLoaded', () => {
+        loadLayout();
+        loadBookings();
+    });
+</script>

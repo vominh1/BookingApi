@@ -305,39 +305,106 @@
     </style>
 </head>
 <body>
-    <!-- Layout -->
-    <div id="header"></div>
-    <div id="banner"></div>
+    <div class="page-container">
+        <div id="sidebar"></div>  <!-- Menu bên trái -->
+        <div class="main-content">
+            <div id="header"></div>  <!-- Header trên -->
+            <div class="content-wrapper">
 
-    <h1>🏨 Danh sách phòng</h1>
-    <div id="room-list" class="loading">Đang tải danh sách phòng...</div>
+                <h1>🏨 Danh sách phòng</h1>
+                <div id="room-list" class="loading">Đang tải danh sách phòng...</div>
 
-    <div id="booking-form" style="display:none;">
-        <h3>📅 Đặt phòng: <span id="room-name"></span></h3>
-        <input type="hidden" id="resource-id">
-        <label>💰 Giá phòng (VNĐ):</label>
-        <input type="number" id="room-price" readonly /><br>
-        <label>📆 Bắt đầu:</label>
-        <input type="datetime-local" id="start-time"><br>
-        <label>📆 Kết thúc:</label>
-        <input type="datetime-local" id="end-time"><br>
+                <div id="booking-form" style="display:none;">
+                    <h3>📅 Đặt phòng: <span id="room-name"></span></h3>
+                    <input type="hidden" id="resource-id">
+                    <label>💰 Giá phòng (VNĐ):</label>
+                    <input type="number" id="room-price" readonly /><br>
+                    <label>📆 Bắt đầu:</label>
+                    <input type="datetime-local" id="start-time"><br>
+                    <label>📆 Kết thúc:</label>
+                    <input type="datetime-local" id="end-time"><br>
 
-        <button onclick="checkAvailability()">🔍 Kiểm tra phòng trống</button>
-        <div id="availability-result"></div>
-    </div>
+                    <button onclick="checkAvailability()">🔍 Kiểm tra phòng trống</button>
+                    <div id="availability-result"></div>
+                </div>
 
-    <hr>
+                <hr>
 
-    <div class="booking-search-section">
-        <h2>🔍 Xem các phòng trong Booking</h2>
-        <div class="search-container">
-            <input type="text" id="booking-code" placeholder="Nhập mã Booking (VD: BK00123)" />
-            <button onclick="loadBookingItems()">🔎 Xem</button>
+                <div class="booking-search-section">
+                    <h2>🔍 Xem các phòng trong Booking</h2>
+                    <div class="search-container">
+                        <input type="text" id="booking-code" placeholder="Nhập mã Booking (VD: BK00123)" />
+                        <button onclick="loadBookingItems()">🔎 Xem</button>
+                    </div>
+                    <div id="booking-items"></div>
+                </div> <!-- Layout -->
+            </div>
+            <div id="footer"></div>  <!-- Footer dưới -->
         </div>
-        <div id="booking-items"></div>
     </div>
 
-    <script src="../Layouts/js/layout.js"></script>
+
+
+    <script>
+        async function loadLayout() {
+            try {
+                // Load header
+                const headerResponse = await fetch("../layouts/header.html");
+                const headerHTML = await headerResponse.text();
+                document.getElementById("header").innerHTML = headerHTML;
+
+                // Load sidebar
+                const sidebarResponse = await fetch("../layouts/sidebar.html");
+                const sidebarHTML = await sidebarResponse.text();
+                document.getElementById("sidebar").innerHTML = sidebarHTML;
+
+                // Load footer
+                const footerResponse = await fetch("../layouts/footer.html");
+                const footerHTML = await footerResponse.text();
+                document.getElementById("footer").innerHTML = footerHTML;
+
+                // Highlight active menu
+                highlightActiveMenu();
+            } catch (error) {
+                console.error("Error loading layouts:", error);
+            }
+        }
+
+        function highlightActiveMenu() {
+            setTimeout(() => {
+                const links = document.querySelectorAll(".nav-link");
+                const savedPage = localStorage.getItem("activePage");
+
+                // Reset tất cả
+                links.forEach(l => l.classList.remove("active"));
+
+                // Nếu có mục đã lưu → highlight
+                if (savedPage) {
+                    links.forEach(l => {
+                        if (l.dataset.page === savedPage) {
+                            l.classList.add("active");
+                        }
+                    });
+                }
+
+                // Khi click → lưu lại
+                links.forEach(link => {
+                    link.addEventListener("click", function () {
+                        localStorage.setItem("activePage", this.dataset.page);
+                    });
+                });
+
+            }, 50); // ⭐ chờ DOM cập nhật sau khi load sidebar
+        }
+
+
+        // Load layout khi trang ready
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLayout();
+            loadBookings();
+        });
+    </script>
+
     <script>
         async function loadBookingItems() {
             const id = document.getElementById('booking-code').value;
@@ -355,25 +422,25 @@
                 const items = await res.json();
                 const container = document.getElementById('booking-items');
                 container.innerHTML = `
-                    <table border="1" cellpadding="5">
-                        <tr>
-                            <th>🏠 Phòng</th>
-                            <th>📅 Bắt đầu</th>
-                            <th>📅 Kết thúc</th>
-                            <th>💰 Giá</th>
-                            <th>📝 Ghi chú</th>
-                        </tr>
-                        ${items.map(i => `
-                            <tr>
-                                <td>${i.resourceName}</td>
-                                <td>${new Date(i.startAt).toLocaleString()}</td>
-                                <td>${new Date(i.endAt).toLocaleString()}</td>
-                                <td id="price">${i.price}</td>
-                                <td>${i.note || ''}</td>
-                            </tr>
-                        `).join('')}
-                    </table>
-                `;
+                                    <table border="1" cellpadding="5">
+                                        <tr>
+                                            <th>🏠 Phòng</th>
+                                            <th>📅 Bắt đầu</th>
+                                            <th>📅 Kết thúc</th>
+                                            <th>💰 Giá</th>
+                                            <th>📝 Ghi chú</th>
+                                        </tr>
+                                        ${items.map(i => `
+                                            <tr>
+                                                <td>${i.resourceName}</td>
+                                                <td>${new Date(i.startAt).toLocaleString()}</td>
+                                                <td>${new Date(i.endAt).toLocaleString()}</td>
+                                                <td id="price">${i.price}</td>
+                                                <td>${i.note || ''}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </table>
+                                `;
             } catch (error) {
                 console.error(error);
                 alert("💥 Lỗi khi tải danh sách phòng!");
@@ -390,16 +457,16 @@
             const rooms = await res.json();
             const container = document.getElementById('room-list');
             container.innerHTML = rooms.map(r => `
-                    <div class="room-card">
-                        <h3>🏠 ${r.name}</h3>
-                        <p id="price">💰 Giá: ${r.price} ₫</p>
-                        <p>${r.description || 'Không có mô tả'}</p>
-                        <p>📍 Vị trí: ${r.location || 'Chưa rõ'}</p>
-                        <button onclick="openBookingForm(${r.resourceId}, '${r.name}', ${r.price})">
-                            📅 Đặt phòng
-                        </button>
-                    </div>
-                `).join('');
+                                        <div class="room-card">
+                                            <h3>🏠 ${r.name}</h3>
+                                            <p id="price">💰 Giá: ${r.price} ₫</p>
+                                            <p>${r.description || 'Không có mô tả'}</p>
+                                            <p>📍 Vị trí: ${r.location || 'Chưa rõ'}</p>
+                                            <button onclick="openBookingForm(${r.resourceId}, '${r.name}', ${r.price})">
+                                                📅 Đặt phòng
+                                            </button>
+                                        </div>
+                                    `).join('');
         }
 
         function openBookingForm(id, name, price) {
@@ -432,11 +499,11 @@
                     result.style.color = '#155724';
                     result.style.border = '2px solid #c3e6cb';
                     result.innerHTML = `<p style="color:green">
-                            ✅ Phòng trống.<br>
-                            <button onclick="confirmBooking(${id}, \`${start}\`, \`${end}\`, ${price})" style="margin-top:15px;">
-                                ✔️ Xác nhận đặt
-                            </button>
-                        </p>`;
+                                                ✅ Phòng trống.<br>
+                                                <button onclick="confirmBooking(${id}, \`${start}\`, \`${end}\`, ${price})" style="margin-top:15px;">
+                                                    ✔️ Xác nhận đặt
+                                                </button>
+                                            </p>`;
                 } else {
                     result.style.background = '#f8d7da';
                     result.style.color = '#721c24';
@@ -481,7 +548,10 @@
             }
         }
 
-        loadRooms();
+        setTimeout(() => {
+            loadRooms();
+        }, 300);
+
     </script>
 </body>
 </html>
