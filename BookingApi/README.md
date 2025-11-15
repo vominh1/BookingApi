@@ -15,7 +15,7 @@ Mục tiêu: xây dựng API backend với đầy đủ nghiệp vụ cơ bản,
 - Chọn phòng, chọn giờ, kiểm tra trùng lịch
 - API: `GET /api/resources/available`, `POST /api/bookingitems`, `GET /api/bookings/{id}/items`
 - Thực hành: validate thời gian, xử lý conflict, exception từ SP
-
+	
 ### 3️⃣ Quản lý Services (Dịch vụ thêm)
 - Cho phép khách chọn thêm dịch vụ (nước, dọn dẹp…)
 - API: `GET /api/services`, `POST /api/bookingservices`, `DELETE /api/bookingservices/{id}`
@@ -54,3 +54,5 @@ Mục tiêu: xây dựng API backend với đầy đủ nghiệp vụ cơ bản,
 - **Stored Procedures**: CreateBooking, AddBookingItem, CheckResourceAvailability
 
 ## 📂 Cấu trúc dự án
+![Booking List](./Images/bookingList.jpg)
+
