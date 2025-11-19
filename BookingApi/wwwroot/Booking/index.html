@@ -9,7 +9,9 @@
     <link href="../css/Style.css" rel="stylesheet" />
 
     <!-- CSS cho layout (header, sidebar, footer) -->
-    <link rel="stylesheet" href="../layouts/css/style.css">
+  
+    <link href="/Layouts/css/style.css" rel="stylesheet" />
+
 </head>
 <body>
     <!-- Thêm cấu trúc layout -->
@@ -96,10 +98,17 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadLayout();
-            loadBookings();
+            loadBookingsPaginated();
+
         });
     </script>
+    <script>
+        let offset = 0;
+        let pageSize = 7;
+        let isLoading = false;
+        let hasMore = true;
 
+    </script>
     <!-- JavaScript gốc của bạn -->
     <script>
         const API_BASE = "https://localhost:44336/api/booking";
@@ -108,66 +117,95 @@
             window.location.href = 'createBooking.html';
         }
 
-        async function loadBookings() {
+        // hàm load all bookings không phân trang
+        //async function loadBookings() {
+        //    try {
+        //        const response = await fetch(API_BASE);
+        //        if (!response.ok) throw new Error("Không thể tải dữ liệu: " + response.status);
+        //        const data = await response.json();
+
+        //        const list = Array.isArray(data) ? data : (data.items || [data]);
+        //        renderBookings(list);
+        //    } catch (err) {
+        //        console.error(err);
+        //        document.getElementById('bookingList').innerHTML =
+        //            '<div class="empty-state">❌ Lỗi tải danh sách: ' + err.message + '</div>';
+        //    }
+        //}
+
+        // Hàm load bookings có phân trang ( offset = 0 và pagesize = 7)
+        async function loadBookingsPaginated() {
+            if (!hasMore || isLoading) return;
+
+            isLoading = true;
+
             try {
-                const response = await fetch(API_BASE);
-                if (!response.ok) throw new Error("Không thể tải dữ liệu: " + response.status);
+                const response = await fetch(`${API_BASE}?offset=${offset}&pageSize=${pageSize}`);
                 const data = await response.json();
 
-                const list = Array.isArray(data) ? data : (data.items || [data]);
-                renderBookings(list);
-            } catch (err) {
-                console.error(err);
-                document.getElementById('bookingList').innerHTML =
-                    '<div class="empty-state">❌ Lỗi tải danh sách: ' + err.message + '</div>';
-            }
-        }
+                const list = data.items || [];
 
-        function renderBookings(bookings) {
+                if (list.length < pageSize) {
+                    hasMore = false; // hết dữ liệu
+                }
+
+                renderBookings(list, true);  // append chứ không clear
+
+                offset += pageSize;
+
+            } catch (err) {
+                console.error("Lỗi tải:", err);
+            }
+
+            isLoading = false;
+        }
+        // Hàm hiển thị danh sách booking
+        function renderBookings(bookings, append = false) {
             const container = document.getElementById('bookingList');
 
-            if (bookings.length === 0) {
-                container.innerHTML = '<div class="empty-state">📭 Chưa có booking nào</div>';
-                return;
-            }
-
-            container.innerHTML = '';
+            if (!append) container.innerHTML = '';
 
             bookings.forEach(b => {
-                const bookingCode = b.bookingCode || b.booking_code || b.BookingCode || '';
-                const created = b.createdAt || b.CreatedAt || b.created_at || b.createdOn;
-                const date = created ? new Date(created).toLocaleDateString('vi-VN') : '';
-                const total = b.totalAmount || b.TotalAmount || b.total || 0;
-                const statusName = b.statusName || b.StatusName || 'Chờ xác nhận';
+                const bookingCode = b.bookingCode || b.BookingCode;
+                const created = b.createdAt || b.CreatedAt;
+                const date = new Date(created).toLocaleDateString('vi-VN');
+                const total = b.totalAmount || b.TotalAmount;
+                const statusName = b.statusName || b.StatusName;
 
                 const card = document.createElement('div');
                 card.className = 'booking-card';
                 card.innerHTML = `
-                                <div class="booking-code">${escapeHtml(bookingCode)}</div>
-                                <div class="booking-info">
-                                    <div class="info-item">
-                                        <span class="info-label">📅 Ngày đặt</span>
-                                        <span class="info-value">${escapeHtml(date)}</span>
+                                    <div class="booking-code">${escapeHtml(bookingCode)}</div>
+                                    <div class="booking-info">
+                                        <div class="info-item">
+                                            <span class="info-label">📅 Ngày đặt</span>
+                                            <span class="info-value">${escapeHtml(date)}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">📊 Trạng thái</span>
+                                            <span class="info-value">${escapeHtml(statusName)}</span>
+                                        </div>
                                     </div>
-                                    <div class="info-item">
-                                        <span class="info-label">📊 Trạng thái</span>
-                                        <span class="info-value">${escapeHtml(statusName)}</span>
+                                    <div class="booking-total">
+                                        <span class="total-label">💰 Tổng cộng</span>
+                                        <span class="total-value">${formatMoney(total)}</span>
                                     </div>
-                                </div>
-                                <div class="booking-total">
-                                    <span class="total-label">💰 Tổng cộng</span>
-                                    <span class="total-value">${formatMoney(total)}</span>
-                                </div>
-                                <div class="booking-actions">
-                                    <button class="action-btn" onclick="viewDetail('${escapeHtml(bookingCode)}')">Xem chi tiết</button>
-                                    <a class="detail-link" onclick="viewDetail('${escapeHtml(bookingCode)}')">
-                                        Chi tiết →
-                                    </a>
-                                </div>
-                            `;
+                                    <div class="booking-actions">
+                                        <button class="action-btn" onclick="viewDetail('${bookingCode}')">Xem chi tiết</button>
+                                    </div>`;
                 container.appendChild(card);
             });
         }
+        // Sự kiện cuộn trang để tải thêm dữ liệu khi gần cuối trang (với mỗi lần load là 1s )
+        window.addEventListener('scroll', () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
+                setTimeout(() => {
+                    loadBookingsPaginated();
+                }, 1000);
+
+            }
+        });
+
 
         async function viewDetail(bookingCode) {
             if (!bookingCode) {
@@ -228,87 +266,87 @@
                     );
 
                     serviceHtml = `
-                                    <div class="modal-section">
-                                        <h3>🛎️ Dịch vụ kèm theo</h3>
-                                        <table class="service-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Tên dịch vụ</th>
-                                                    <th style="text-align: center;">Số lượng</th>
-                                                    <th style="text-align: right;">Đơn giá</th>
-                                                    <th style="text-align: right;">Thành tiền</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                ${groupedServices.map(s => `
-                                                    <tr>
-                                                        <td>${escapeHtml(s.name)}</td>
-                                                        <td style="text-align: center;">${s.quantity}</td>
-                                                        <td style="text-align: right;">${formatMoney(s.unitPrice)}</td>
-                                                        <td style="text-align: right;">${formatMoney(s.unitPrice * s.quantity)}</td>
-                                                    </tr>
-                                                `).join('')}
-                                            </tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <td colspan="3" style="text-align: right;">💎 Tổng cộng:</td>
-                                                    <td style="text-align: right;">${formatMoney(totalService)}</td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-                                    </div>
-                                `;
+                                                                            <div class="modal-section">
+                                                                                <h3>🛎️ Dịch vụ kèm theo</h3>
+                                                                                <table class="service-table">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th>Tên dịch vụ</th>
+                                                                                            <th style="text-align: center;">Số lượng</th>
+                                                                                            <th style="text-align: right;">Đơn giá</th>
+                                                                                            <th style="text-align: right;">Thành tiền</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        ${groupedServices.map(s => `
+                                                                                            <tr>
+                                                                                                <td>${escapeHtml(s.name)}</td>
+                                                                                                <td style="text-align: center;">${s.quantity}</td>
+                                                                                                <td style="text-align: right;">${formatMoney(s.unitPrice)}</td>
+                                                                                                <td style="text-align: right;">${formatMoney(s.unitPrice * s.quantity)}</td>
+                                                                                            </tr>
+                                                                                        `).join('')}
+                                                                                    </tbody>
+                                                                                    <tfoot>
+                                                                                        <tr>
+                                                                                            <td colspan="3" style="text-align: right;">💎 Tổng cộng:</td>
+                                                                                            <td style="text-align: right;">${formatMoney(totalService)}</td>
+                                                                                        </tr>
+                                                                                    </tfoot>
+                                                                                </table>
+                                                                            </div>
+                                                                        `;
                 } else {
                     serviceHtml = `
-                                    <div class="modal-section">
-                                        <h3>🛎️ Dịch vụ kèm theo</h3>
-                                        <p style="text-align: center; color: #999; padding: 20px;">Không có dịch vụ nào.</p>
-                                    </div>
-                                `;
+                                                                            <div class="modal-section">
+                                                                                <h3>🛎️ Dịch vụ kèm theo</h3>
+                                                                                <p style="text-align: center; color: #999; padding: 20px;">Không có dịch vụ nào.</p>
+                                                                            </div>
+                                                                        `;
                 }
 
                 content.innerHTML = `
-                                <div class="modal-row">
-                                    <span class="modal-label">📋 Mã Booking:</span>
-                                    <span class="modal-value">${escapeHtml(bookingCodeResp)}</span>
-                                </div>
-                                <div class="modal-row">
-                                    <span class="modal-label">🆔 ID Booking:</span>
-                                    <span class="modal-value">${escapeHtml(bookingId)}</span>
-                                </div>
-                                <div class="modal-row">
-                                    <span class="modal-label">📅 Ngày tạo:</span>
-                                    <span class="modal-value">${escapeHtml(createdStr)}</span>
-                                </div>
-                                <div class="modal-row">
-                                    <span class="modal-label">📊 Trạng thái:</span>
-                                    <span class="modal-value">${escapeHtml(statusName)}</span>
-                                </div>
-                                <div class="modal-row">
-                                    <span class="modal-label">💰 Tổng tiền:</span>
-                                    <span class="modal-value">${formatMoney(total)}</span>
-                                </div>
-                                <div class="modal-section">
-                                    <h3>👤 Thông tin khách hàng</h3>
-                                    <div class="modal-row">
-                                        <span class="modal-label">🆔 ID Khách hàng:</span>
-                                        <span class="modal-value">${escapeHtml(custId)}</span>
-                                    </div>
-                                    <div class="modal-row">
-                                        <span class="modal-label">👨 Họ tên:</span>
-                                        <span class="modal-value">${escapeHtml(fullName)}</span>
-                                    </div>
-                                    <div class="modal-row">
-                                        <span class="modal-label">📧 Email:</span>
-                                        <span class="modal-value">${escapeHtml(email)}</span>
-                                    </div>
-                                    <div class="modal-row">
-                                        <span class="modal-label">📱 SĐT:</span>
-                                        <span class="modal-value">${escapeHtml(phone)}</span>
-                                    </div>
-                                </div>
-                                ${serviceHtml}
-                            `;
+                                                                        <div class="modal-row">
+                                                                            <span class="modal-label">📋 Mã Booking:</span>
+                                                                            <span class="modal-value">${escapeHtml(bookingCodeResp)}</span>
+                                                                        </div>
+                                                                        <div class="modal-row">
+                                                                            <span class="modal-label">🆔 ID Booking:</span>
+                                                                            <span class="modal-value">${escapeHtml(bookingId)}</span>
+                                                                        </div>
+                                                                        <div class="modal-row">
+                                                                            <span class="modal-label">📅 Ngày tạo:</span>
+                                                                            <span class="modal-value">${escapeHtml(createdStr)}</span>
+                                                                        </div>
+                                                                        <div class="modal-row">
+                                                                            <span class="modal-label">📊 Trạng thái:</span>
+                                                                            <span class="modal-value">${escapeHtml(statusName)}</span>
+                                                                        </div>
+                                                                        <div class="modal-row">
+                                                                            <span class="modal-label">💰 Tổng tiền:</span>
+                                                                            <span class="modal-value">${formatMoney(total)}</span>
+                                                                        </div>
+                                                                        <div class="modal-section">
+                                                                            <h3>👤 Thông tin khách hàng</h3>
+                                                                            <div class="modal-row">
+                                                                                <span class="modal-label">🆔 ID Khách hàng:</span>
+                                                                                <span class="modal-value">${escapeHtml(custId)}</span>
+                                                                            </div>
+                                                                            <div class="modal-row">
+                                                                                <span class="modal-label">👨 Họ tên:</span>
+                                                                                <span class="modal-value">${escapeHtml(fullName)}</span>
+                                                                            </div>
+                                                                            <div class="modal-row">
+                                                                                <span class="modal-label">📧 Email:</span>
+                                                                                <span class="modal-value">${escapeHtml(email)}</span>
+                                                                            </div>
+                                                                            <div class="modal-row">
+                                                                                <span class="modal-label">📱 SĐT:</span>
+                                                                                <span class="modal-value">${escapeHtml(phone)}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        ${serviceHtml}
+                                                                    `;
             } catch (err) {
                 console.error(err);
                 content.innerHTML = `<p style="color: #f44336; text-align: center; padding: 20px;">❌ Có lỗi: ${escapeHtml(err.message)}</p>`;

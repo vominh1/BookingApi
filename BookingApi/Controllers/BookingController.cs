@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using BookingApi.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using BookingApi.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace BookingApi.Controllers
 {
     [Route("api/[controller]")]
@@ -19,23 +18,37 @@ namespace BookingApi.Controllers
 
         // Lấy danh sách booking
         [HttpGet]
-        public IActionResult GetAll()
-        {
-            var bookings = (from bk in _context.Bookings
-                            join st in _context.Status on bk.StatusId equals st.StatusId
-                            select new
-                            {
-                                bk.BookingId,
-                                bk.CustomerId,
-                                bk.BookingCode,
-                                bk.CreatedAt,
-                                bk.StatusId,
-                                StatusName = st.StatusName,  // 👈 lấy tên từ bảng Status
-                                bk.TotalAmount
-                            })
-                            .ToList();
 
-            return Ok(bookings);
+        public IActionResult GetAll(int offset = 0, int pageSize =7)
+        {
+            var query = from bk in _context.Bookings
+                        join st in _context.Status on bk.StatusId equals st.StatusId
+                        orderby bk.CreatedAt descending   // sắp xếp mới nhất
+                        select new
+                        {
+                            bk.BookingId,
+                            bk.CustomerId,
+                            bk.BookingCode,
+                            bk.CreatedAt,
+                            bk.StatusId,
+                            StatusName = st.StatusName,
+                            bk.TotalAmount
+                        };
+
+            var total = query.Count();
+
+            var bookings = query
+                .Skip(offset)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(new
+            {
+                total,
+                offset,
+                pageSize,
+                items = bookings
+            });
         }
 
 
